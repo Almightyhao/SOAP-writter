@@ -3,182 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- v15.4: 更新 Title -->
-    <title>智能藥師 SOAP小幫手 (v15.4)</title>
-    <!-- 載入 Tailwind CSS -->
+    <title>智能藥師 SOAP小幫手 (v15.4 - 法律聲明)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* 使用 Inter 字體 */
+        /* (樣式保持不變) */
         body {
-            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
         }
-        /* 載入狀態的 spinner 動畫 */
-        .spinner {
-            border-top-color: transparent;
-            width: 1.5rem;
-            height: 1.5rem;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        /* 增加 prose 中 pre 的可讀性 */
-        .prose pre {
-            background-color: #f9fafb; /* bg-gray-50 */
-            color: #1f2937; /* text-gray-800 */
-            padding: 1rem;
+        .spinner { border-top-color: transparent; width: 1.5rem; height: 1.5rem; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .prose pre { background-color: #f9fafb; color: #1f2937; padding: 1rem; border-radius: 0.5rem; border: 1px solid #e5e7eb; white-space: pre-wrap; font-family: inherit; font-size: 0.95rem; }
+        #guidelineList li { padding: 4px 0; border-bottom: 1px solid #f3f4f6; }
+        #guidelineList li:last-child { border-bottom: none; }
+        details summary { cursor: pointer; font-weight: 600; color: #2563eb; }
+        details summary:hover { text-decoration: underline; }
+        .instruction-step { margin-top: 1rem; }
+        .instruction-step h4 { font-weight: 600; color: #1f2937; }
+        .instruction-step p { font-size: 0.95rem; color: #374151; }
+        .instruction-step code { background-color: #f3f4f6; color: #c026d3; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-family: monospace; }
+        #progressBarContainer { display: none; width: 100%; background-color: #e5e7eb; border-radius: 9999px; overflow: hidden; margin-bottom: 1rem; }
+        .progress-bar { width: 100%; height: 0.75rem; background-color: #3b82f6; border-radius: 9999px; animation: indeterminate-progress 2s linear infinite; }
+        @keyframes indeterminate-progress { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+        /* v15.4 Legal: 使用條款區塊樣式 */
+        .terms-section {
+            background-color: #fffbeb; /* bg-yellow-50 */
+            border: 1px solid #fcd34d; /* border-yellow-300 */
+            color: #92400e; /* text-yellow-800 */
             border-radius: 0.5rem;
-            border: 1px solid #e5e7eb; /* border-gray-200 */
-            /* v14.3: 讓 pre 內的文字自動換行 */
-            white-space: pre-wrap;
-            /* v14.3: 使用與 body 相同的字體 */
-            font-family: inherit;
-            font-size: 0.95rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem; /* mb-6 */
         }
-        /* 查詢列表的樣式 */
-        #guidelineList li {
-            padding: 4px 0;
-            border-bottom: 1px solid #f3f4f6; /* border-gray-100 */
+        .terms-section h3 {
+            font-weight: 700; /* font-bold */
+            color: #b45309; /* text-yellow-700 */
+            display: flex;
+            align-items: center;
         }
-        #guidelineList li:last-child {
-            border-bottom: none;
-        }
-        /* 說明區塊的樣式 */
-        details summary {
-            cursor: pointer;
-            font-weight: 600;
-            /* v15.1 UI: 修改顏色 */
-            color: #2563eb; /* text-blue-600 */
-        }
-        details summary:hover {
-            text-decoration: underline;
-        }
-        .instruction-step {
-            margin-top: 1rem;
-        }
-        .instruction-step h4 {
-            font-weight: 600;
-            color: #1f2937; /* text-gray-800 */
-        }
-        .instruction-step p {
-            font-size: 0.95rem;
-            color: #374151; /* text-gray-700 */
-        }
-        .instruction-step code {
-            background-color: #f3f4f6; /* bg-gray-100 */
-            color: #c026d3; /* text-fuchsia-700 */
-            padding: 0.125rem 0.375rem;
-            border-radius: 0.25rem;
-            font-family: monospace;
-        }
-        
-        /* (v14) AI 運算進度條 */
-        #progressBarContainer {
-            display: none;
-            width: 100%;
-            background-color: #e5e7eb; /* bg-gray-200 */
-            border-radius: 9999px; /* rounded-full */
-            overflow: hidden;
-            margin-bottom: 1rem;
-        }
-        .progress-bar {
-            width: 100%;
-            height: 0.75rem; /* h-3 */
-            /* v15.1 UI: 修改顏色 */
-            background-color: #3b82f6; /* bg-blue-500 */
-            border-radius: 9999px;
-            animation: indeterminate-progress 2s linear infinite;
-        }
-        @keyframes indeterminate-progress {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+        .terms-section ul {
+            list-style-type: decimal; /* 數字列表 */
+            margin-left: 1.5rem; /* ml-6 */
+            font-size: 0.9rem; /* text-sm */
+            margin-top: 0.5rem; /* mt-2 */
+            line-height: 1.6; /* leading-relaxed */
         }
     </style>
 </head>
-<!-- v15 UI: 修改背景色為微妙漸層 -->
 <body class="bg-gradient-to-br from-slate-50 to-gray-100 min-h-screen text-gray-800">
 
     <div class="container mx-auto max-w-6xl p-4 py-8">
-        <!-- 標題 -->
         <header class="text-center mb-8">
-            <!-- v15.4 UI: 更新 Title -->
             <h1 class="text-3xl md:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">智能藥師 SOAP小幫手 (v15.4)</h1>
             <p class="mt-2 text-lg text-gray-600">AI 驅動的指引查核、DDI 分析與筆記草稿</p>
         </header>
 
-        <!-- (v10) API 金鑰設定區塊 -->
-        <!-- v15.1 UI: 陰影加深, 修改顏色 -->
         <section class="bg-white p-6 rounded-xl shadow-xl mb-6 border-l-4 border-blue-500">
-            <h2 class="text-2xl font-semibold mb-4 text-gray-700 flex items-center">
-                <!-- 圖示: Settings -->
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 text-blue-500"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                連線設定 (僅需設定一次)
-            </h2>
-            <div class="flex flex-col md:flex-row md:items-center gap-4">
-                <div class="flex-grow">
-                    <label for="apiKeyInput" class="block text-sm font-medium text-gray-600 mb-2">Google Gemini API 金鑰</label>
-                    <input type="password" id="apiKeyInput" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="請貼上您的 Google Gemini API 金鑰">
-                </div>
-                <button id="saveApiKeyButton" class="bg-blue-600 text-white font-bold py-3 px-5 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-transform duration-200 hover:scale-105 mt-1 md:mt-0">
-                    儲存金鑰
-                </button>
-            </div>
-            <p id="apiKeyStatus" class="text-sm mt-3 text-gray-500">狀態：尚未設定。金鑰將儲存在您的瀏覽器 (localStorage) 中。</p>
-        </section>
+             <h2 class="text-2xl font-semibold mb-4 text-gray-700 flex items-center">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 text-blue-500"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                 連線設定 (僅需設定一次)
+             </h2>
+             <div class="flex flex-col md:flex-row md:items-center gap-4">
+                 <div class="flex-grow">
+                     <label for="apiKeyInput" class="block text-sm font-medium text-gray-600 mb-2">Google Gemini API 金鑰</label>
+                     <input type="password" id="apiKeyInput" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="請貼上您的 Google Gemini API 金鑰">
+                 </div>
+                 <button id="saveApiKeyButton" class="bg-blue-600 text-white font-bold py-3 px-5 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-transform duration-200 hover:scale-105 mt-1 md:mt-0">
+                     儲存金鑰
+                 </button>
+             </div>
+             <p id="apiKeyStatus" class="text-sm mt-3 text-gray-500">狀態：尚未設定。金鑰將儲存在您的瀏覽器 (localStorage) 中。</p>
+         </section>
 
-
-        <!-- (v10) 即時指引查詢區塊 -->
-        <!-- v15.1 UI: 陰影加深 -->
         <section class="bg-white p-6 rounded-xl shadow-xl mb-6">
-            <h2 class="text-2xl font-semibold mb-4 text-gray-700 flex items-center">
-                <!-- 圖示: Database Zap -->
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 text-blue-500"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5V19A9 3 0 0 0 21 19V5"></path><path d="M3 12A9 3 0 0 0 21 12"></path></svg>
-                AI 知識庫即時狀態
-            </h2>
-            <p class="text-sm text-gray-600 mb-4">
-                AI 會在「每次」產生筆記時即時搜尋。您也可以點擊下方按鈕，主動查詢常見指引的最新版本。
-            </p>
-            <button id="queryGuidelinesButton" class="bg-green-600 text-white font-bold py-2 px-5 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-transform duration-200 hover:scale-105 flex items-center justify-center">
-                <div id="guidelineSpinner" class="spinner border-4 border-white rounded-full mr-3 hidden"></div>
-                <!-- 圖示: Search -->
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                即時查詢主要指引版本
-            </button>
+             <h2 class="text-2xl font-semibold mb-4 text-gray-700 flex items-center">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 text-blue-500"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5V19A9 3 0 0 0 21 19V5"></path><path d="M3 12A9 3 0 0 0 21 12"></path></svg>
+                 AI 知識庫即時狀態
+             </h2>
+             <p class="text-sm text-gray-600 mb-4">
+                 AI 會在「每次」產生筆記時即時搜尋。您也可以點擊下方按鈕，主動查詢常見指引的最新版本。
+             </p>
+             <button id="queryGuidelinesButton" class="bg-green-600 text-white font-bold py-2 px-5 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-transform duration-200 hover:scale-105 flex items-center justify-center">
+                 <div id="guidelineSpinner" class="spinner border-4 border-white rounded-full mr-3 hidden"></div>
+                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                 </svg>
+                 即時查詢主要指引版本
+             </button>
+             <div id="guidelineListContainer" class="mt-4 hidden">
+                 <h3 class="text-lg font-semibold text-gray-800 mb-2">即時查詢結果：</h3>
+                 <ul id="guidelineList" class="text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-200"></ul>
+             </div>
+         </section>
 
-            <!-- 查詢結果顯示區 -->
-            <div id="guidelineListContainer" class="mt-4 hidden">
-                <h3 class="text-lg font-semibold text-gray-800 mb-2">即時查詢結果：</h3>
-                <ul id="guidelineList" class="text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-200">
-                    <!-- 查詢結果將動態插入這裡 -->
-                </ul>
-            </div>
-        </section>
-
-
-        <!-- 主內容區塊：分為輸入和輸出 -->
         <main class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-            <!-- 左側：輸入區塊 -->
-            <!-- v15.1 UI: 陰影加深 -->
             <div class="bg-white p-6 rounded-xl shadow-xl flex flex-col">
-                <!-- v14 UI: 標題加入圖示, 並將清除按鈕移到這裡 -->
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-2xl font-semibold text-gray-700 flex items-center">
-                        <!-- 圖示: File Text -->
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 text-blue-500"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
                         1. 輸入病患資料
                     </h2>
-                    <!-- (v15 UI) 一鍵清除, 加入 hover 效果 -->
                     <button id="clearInputsButton" class="text-sm text-slate-500 hover:text-red-600 font-medium py-1 px-2 rounded-lg hover:bg-red-50 transition-all duration-200 hover:scale-105 hover:shadow-md flex items-center">
-                        <!-- 圖示: Trash -->
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 mr-1"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
                         一鍵清除
                     </button>
                 </div>
 
-                <!-- (v14.1) 專科焦點 -->
                 <div class="mb-4">
                     <label for="specialtyFocus" class="block text-sm font-medium text-gray-600 mb-2">
                         專科焦點 (選填)
@@ -198,23 +127,32 @@
                     </select>
                 </div>
 
-                <!-- (v14) 病患核心資料 -->
+                <div class="terms-section">
+                    <h3>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2 text-yellow-600"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        使用條款與隱私聲明 (必讀)
+                    </h3>
+                    <ul>
+                        <li>使用者（藥師）承諾並保證，所有輸入本工具的病患資料，**均已完成「去識別化」**，已移除所有可直接或間接識別特定個人的資訊 (例如：姓名、病歷號、身分證字號、聯絡方式、完整生日等)。</li>
+                        <li>使用者理解並同意，提交的「去識別化」匿名資料將被傳送給第三方 AI 服務（例如 Google Gemini API）進行分析處理，以產生 SOAP 筆記草稿。</li>
+                        <li>若使用者違反上述承諾，輸入了「可識別」的個人資料，導致任何法律責任、資料外洩、或侵害第三方權益之情事，**所有相關法律責任與損害賠償應由該使用者自行承擔**，與本工具開發者無涉。</li>
+                        <li>**請再次確認您輸入的資料不含任何可識別個人的資訊後，再按下「啟動 AI 分析」按鈕。**</li>
+                    </ul>
+                    </div>
+
                 <div class="mb-4">
                     <label for="patientInfo" class="block text-sm font-medium text-gray-600 mb-2">
                         病患核心資料 (必填)
                         <span class="text-xs text-gray-500">(例如：主訴、病史、診斷、Lab、用藥...)</span>
                     </label>
-                    <!-- v15.2: 縮減 rows 讓空間更均衡 -->
-                    <textarea id="patientInfo" rows="10" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="請貼入病患的相關資訊..."></textarea>
+                    <textarea id="patientInfo" rows="10" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="請貼入「去識別化」後的病患資訊..."></textarea>
                 </div>
 
-                <!-- (v15.2) 整合專業資料庫 (分開) -->
                 <div class="mb-4">
                     <label for="uptodateInfo" class="block text-sm font-medium text-gray-600 mb-2">
                         整合 UpToDate (選填)
                     </label>
                     <textarea id="uptodateInfo" rows="4" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="貼上 UpToDate 的重點..."></textarea>
-
                 </div>
                 <div class="mb-4">
                     <label for="micromedexInfo" class="block text-sm font-medium text-gray-600 mb-2">
@@ -229,162 +167,135 @@
                     <textarea id="openevidenceInfo" rows="4" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="貼上 OpenEvidence 的重點..."></textarea>
                 </div>
 
-
-                <!-- 功能按鈕群組 -->
-                <!-- v15.1 UI: 修改主按鈕漸層、文字、Hover 效果 -->
-                <div class="mt-auto pt-4"> <!-- mt-auto 將按鈕推到底部 -->
+                <div class="mt-auto pt-4">
                     <button id="generateButton" class="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 ease-in-out hover:scale-105 flex items-center justify-center">
                         🚀 啟動 AI 分析
                     </button>
                 </div>
             </div>
 
-            <!-- 右側：輸出區塊 -->
-            <!-- v15.1 UI: 陰影加深 -->
             <div class="bg-white p-6 rounded-xl shadow-xl">
-                <!-- v14 UI: 加入圖示 -->
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-2xl font-semibold text-gray-700 flex items-center">
-                        <!-- 圖示: Clipboard List -->
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 text-blue-500"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><line x1="12" y1="11" x2="12" y2="17"></line><line x1="9" y1="14" x2="15" y2="14"></line></svg>
-                        2. 產生的筆記草稿
-                    </h2>
-                    <!-- (v15 UI) 一鍵複製, 加入 hover 效果 -->
-                    <button id="copyButton" class="bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-transform duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                        一鍵複製
-                    </button>
-                </div>
+                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 text-blue-500"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><line x1="12" y1="11" x2="12" y2="17"></line><line x1="9" y1="14" x2="15" y2="14"></line></svg>
+                         2. 產生的筆記草稿
+                     </h2>
+                     <button id="copyButton" class="bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-transform duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                         一鍵複製
+                     </button>
+                 </div>
                 
-                <!-- (v14) AI 運算進度條 -->
-                <div id="progressBarContainer">
-                    <div class="progress-bar"></div>
-                </div>
+                 <div id="progressBarContainer">
+                     <div class="progress-bar"></div>
+                 </div>
 
-                <!-- 提示訊息 -->
-                <!-- v15 UI: ID 用於載入動畫 -->
-                <div id="placeholder" class="text-center text-gray-500 p-8 border-2 border-dashed border-gray-300 rounded-lg transition-opacity duration-300">
-                    <p class="font-semibold">AI 將自動執行以下任務：</p>
-                    <ul class="list-disc list-inside text-left mt-2 text-sm">
-                        <li>分析病歷並識別主要問題。</li>
-                        <li>即時上網搜尋最新的國際指引 (GINA, GOLD...)。</li>
-                        <li>評估 DDI 與重複用藥。</li>
-                        <li>(v15.2) 整合您提供的資料庫重點並註明來源。</li>
-                    </ul>
-                    <p class="text-sm mt-4">所有內容均需由專業藥師最終審核。</p>
-                </div>
+                 <div id="placeholder" class="text-center text-gray-500 p-8 border-2 border-dashed border-gray-300 rounded-lg transition-opacity duration-300">
+                     <p class="font-semibold">AI 將自動執行以下任務：</p>
+                     <ul class="list-disc list-inside text-left mt-2 text-sm">
+                         <li>分析病歷並識別主要問題。</li>
+                         <li>即時上網搜尋最新的國際指引 (GINA, GOLD...)。</li>
+                         <li>評估 DDI 與重複用藥。</li>
+                         <li>(v15.2) 整合您提供的資料庫重點並註明來源。</li>
+                     </ul>
+                     <p class="text-sm mt-4">所有內容均需由專業藥師最終審核。</p>
+                 </div>
 
-                <!-- 輸出結果顯示區 -->
-                <!-- v14.3: 新增 prose-pre:whitespace-pre-wrap 確保 pre 換行 -->
-                <div id="output" class="hidden prose max-w-none prose-pre:whitespace-pre-wrap bg-gray-50 p-4 rounded-lg border border-gray-200" style="min-height: 200px;"></div>
+                 <div id="output" class="hidden prose max-w-none prose-pre:whitespace-pre-wrap bg-gray-50 p-4 rounded-lg border border-gray-200" style="min-height: 200px;"></div>
 
-                <!-- 功能說明區塊 -->
-                <!-- v15.1 UI: 修改顏色 -->
-                <div id="infoBox" class="hidden mt-4 bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg">
-                    <!-- v15.4: 更新 Title -->
-                    <h4 class="font-bold text-sm">AI 輔助說明 (v15.4)：</h4>
-                    <ul class="list-disc list-inside text-sm mt-1">
-                        <li>**最新指引：** AI 已被指示在「Assessment」中**必須註明**所參考指引的**「實際年份」**與**「原文句子」**。</li>
-                        <li>**DDI 分析：** 藥物交互作用 (DDI) 評估已使用 Gemini 深度研究功能完成。</li>
-                        <li>**資料庫整合：** (v15.2) AI 已整合您提供的 UpToDate/Micromedex/OpenEvidence 資訊。</li>
-                        <li>**專業審核：** 內容僅供參考，請務必由您進行最終的專業審核與修改。</li>
-                    </ul>
-                </div>
+                 <div id="infoBox" class="hidden mt-4 bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg">
+                     <h4 class="font-bold text-sm">AI 輔助說明 (v15.4)：</h4>
+                     <ul class="list-disc list-inside text-sm mt-1">
+                         <li>**最新指引：** AI 已被指示在「Assessment」中**必須註明**所參考指引的**「實際年份」**與**「原文句子」**。</li>
+                         <li>**DDI 分析：** 藥物交互作用 (DDI) 評估已使用 Gemini 深度研究功能完成。</li>
+                         <li>**資料庫整合：** AI 已整合您提供的 UpToDate/Micromedex/OpenEvidence 資訊。</li>
+                         <li>**專業審核：** 內容僅供參考，請務必由您進行最終的專業審核與修改。</li>
+                     </ul>
+                 </div>
 
-                <!-- 參考指引 (動態顯示) -->
-                <div id="sourcesContainer" class="hidden mt-6">
-                    <h3 id="sourcesTitle" class="text-lg font-semibold text-gray-600 mb-2">引用的指引與參考來源：</h3>
-                    <ul id="sourcesList" class="list-none list-inside text-sm space-y-1">
-                        <!-- 
-                          這裡將顯示 AI 總結的清單 (粗體)，
-                          以及 Google 搜尋到的連結 (藍色) 
-                        -->
-                    </ul>
-                </div>
-            </div>
-        </main>
+                 <div id="sourcesContainer" class="hidden mt-6">
+                     <h3 id="sourcesTitle" class="text-lg font-semibold text-gray-600 mb-2">引用的指引與參考來源：</h3>
+                     <ul id="sourcesList" class="list-none list-inside text-sm space-y-1"></ul>
+                 </div>
+             </div>
+         </main>
 
-        <!-- (v10) 詳細使用說明 -->
-        <!-- v15.1 UI: 陰影加深 -->
         <section class="bg-white p-6 rounded-xl shadow-xl mt-6">
             <details>
-                <summary class="text-xl">如何取得與使用 API 金鑰？</summary>
-                <div class="mt-4 prose max-w-none">
-                    <p>
-                        這個工具需要「Google Gemini API 金鑰」才能啟動 AI 大腦並連線到 Google 搜尋。這是一把專屬於您的鑰匙。
-                        <br>
-                        這個金鑰**只會**儲存在您當前的瀏覽器 (<code>localStorage</code>) 中，不會上傳到任何伺G伺服器，因此非常安全。
-                    </p>
-                    
-                    <div class="instruction-step">
-                        <h4>步驟 1：前往 Google AI Studio</h4>
-                        <p>
-                            點擊此連結 <a href="https://aistudio.google.com/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">https://aistudio.google.com/</a>，並使用您的 Google 帳號登入。
-                        </p>
-                    </div>
-                    
-                    <div class="instruction-step">
-                        <h4>步驟 2：建立 API 金鑰</h4>
-                        <p>
-                            登入後，點擊頁面左側的「Get API key」(取得 API 金鑰)。
-                            <br>
-                            在下一個畫面中，點擊「Create API key in new project」(在新專案中建立 API 金鑰)。
-                        </p>
-                    </div>
+                 <summary class="text-xl">如何取得與使用 API 金鑰？</summary>
+                 <div class="mt-4 prose max-w-none">
+                     <p>
+                         這個工具需要「Google Gemini API 金鑰」才能啟動 AI 大腦並連線到 Google 搜尋。這是一把專屬於您的鑰匙。
+                         <br>
+                         這個金鑰**只會**儲存在您當前的瀏覽器 (<code>localStorage</code>) 中，不會上傳到任何伺服器，因此非常安全。
+                     </p>
+                     
+                     <div class="instruction-step">
+                         <h4>步驟 1：前往 Google AI Studio</h4>
+                         <p>
+                             點擊此連結 <a href="https://aistudio.google.com/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">https://aistudio.google.com/</a>，並使用您的 Google 帳號登入。
+                         </p>
+                     </div>
+                     
+                     <div class="instruction-step">
+                         <h4>步驟 2：建立 API 金鑰</h4>
+                         <p>
+                             登入後，點擊頁面左側的「Get API key」(取得 API 金鑰)。
+                             <br>
+                             在下一個畫面中，點擊「Create API key in new project」(在新專案中建立 API 金鑰)。
+                         </p>
+                     </div>
 
-                    <div class="instruction-step">
-                        <h4>步驟 3：複製金鑰</h4>
-                        <p>
-                            畫面上會彈出一個視窗，顯示您新產生的金鑰（它是一長串隨機字母和數字，例如 <code>AIzaSy...</code>）。
-                            <br>
-                            請點擊它旁邊的「複製」按鈕。
-                        </p>
-                    </div>
+                     <div class="instruction-step">
+                         <h4>步驟 3：複製金鑰</h4>
+                         <p>
+                             畫面上會彈出一個視窗，顯示您新產生的金鑰（它是一長串隨機字母和數字，例如 <code>AIzaSy...</code>）。
+                             <br>
+                             請點擊它旁邊的「複製」按鈕。
+                         </p>
+                     </div>
 
-                    <div class="instruction-step">
-                        <h4>步驟 4：貼上並儲存</h4>
-                        <p>
-                            回到這個頁面，將您剛剛複製的金鑰，貼到最上方的「Google Gemini API 金鑰」輸入框中。
-                            <br>
-                            點擊「儲存金鑰」。
-                        </p>
-                    </div>
-                    
-                    <div class="instruction-step">
-                        <h4>步驟 5：完成！</h4>
-                        <p>
-                            您現在可以開始使用這個工具了。金鑰已儲存，您下次重新整理或打開這個 HTML 檔案時，都不需要再重新輸入。
-                        </S>
-                    </div>
-                </div>
-            </details>
-        </section>
-    </div>
+                     <div class="instruction-step">
+                         <h4>步驟 4：貼上並儲存</h4>
+                         <p>
+                             回到這個頁面，將您剛剛複製的金鑰，貼到最上方的「Google Gemini API 金鑰」輸入框中。
+                             <br>
+                             點擊「儲存金鑰」。
+                         </p>
+                     </div>
+                     
+                     <div class="instruction-step">
+                         <h4>步驟 5：完成！</h4>
+                         <p>
+                             您現在可以開始使用這個工具了。金鑰已儲存，您下次重新整理或打開這個 HTML 檔案時，都不需要再重新輸入。
+                         </p>
+                     </div>
+                 </div>
+             </details>
+         </section>
+     </div>
 
-    <!-- 錯誤訊息 Modal (預設隱藏) -->
     <div id="errorModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center hidden z-50">
         <div class="relative mx-auto p-5 border w-full max-w-md shadow-lg rounded-xl bg-white">
             <div class="mt-3 text-center">
                 <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-                    <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </div>
-                <h3 class="text-lg leading-6 font-medium text-gray-900 mt-2">發生錯誤</h3>
-                <div class="mt-2 px-7 py-3">
-                    <p id="errorMessage" class="text-sm text-gray-500">無法產生筆記，請稍後再試。</p>
-                </div>
-                <div class="items-center px-4 py-3">
-                    <button id="closeModalButton" class="px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">關閉</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
+                     <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                 </div>
+                 <h3 class="text-lg leading-6 font-medium text-gray-900 mt-2">發生錯誤</h3>
+                 <div class="mt-2 px-7 py-3">
+                     <p id="errorMessage" class="text-sm text-gray-500">無法產生筆記，請稍後再試。</p>
+                 </div>
+                 <div class="items-center px-4 py-3">
+                     <button id="closeModalButton" class="px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">關閉</button>
+                 </div>
+             </div>
+         </div>
+     </div>
 
     <script>
         // === DOM 元素 ===
         const generateButton = document.getElementById('generateButton');
         const patientInfoInput = document.getElementById('patientInfo');
         const specialtyFocusSelect = document.getElementById('specialtyFocus');
-        // (v15.2) 新增資料庫 DOM
         const uptodateInfoInput = document.getElementById('uptodateInfo');
         const micromedexInfoInput = document.getElementById('micromedexInfo');
         const openevidenceInfoInput = document.getElementById('openevidenceInfo');
@@ -396,22 +307,18 @@
         const sourcesList = document.getElementById('sourcesList');
         const sourcesTitle = document.getElementById('sourcesTitle');
 
-        // (v14) 按鈕
         const clearInputsButton = document.getElementById('clearInputsButton');
         const copyButton = document.getElementById('copyButton');
         const progressBarContainer = document.getElementById('progressBarContainer');
 
-        // (v10) API 金鑰 DOM
         const apiKeyInput = document.getElementById('apiKeyInput');
         const saveApiKeyButton = document.getElementById('saveApiKeyButton');
         const apiKeyStatus = document.getElementById('apiKeyStatus');
 
-        // (v10) 錯誤 Modal
         const errorModal = document.getElementById('errorModal');
         const errorMessage = document.getElementById('errorMessage');
         const closeModalButton = document.getElementById('closeModalButton');
 
-        // (v10) 指引查詢
         const queryGuidelinesButton = document.getElementById('queryGuidelinesButton');
         const guidelineSpinner = document.getElementById('guidelineSpinner');
         const guidelineListContainer = document.getElementById('guidelineListContainer');
@@ -420,13 +327,10 @@
         // === 全域變數 ===
         let apiKey = "";
         
-        // (v14.2) 移除模型選擇, 鎖定 Flash
         const modelName = "gemini-2.5-flash-preview-09-2025";
         const apiUrlBase = "https://generativelanguage.googleapis.com/v1beta/models/";
 
-        // === API 金鑰處理 (v10) ===
-        
-        // 儲存 API 金鑰
+        // === API 金鑰處理 ===
         function saveApiKey() {
             const key = apiKeyInput.value.trim();
             if (key) {
@@ -435,7 +339,7 @@
                     apiKey = key;
                     apiKeyStatus.textContent = "狀態：金鑰已儲存並載入。";
                     apiKeyStatus.className = "text-sm mt-3 text-green-600";
-                    apiKeyInput.value = ""; // 基於安全，清除輸入框
+                    apiKeyInput.value = ""; 
                     apiKeyInput.placeholder = "金鑰已儲存";
                 } catch (e) {
                     apiKeyStatus.textContent = "狀態：無法儲存金鑰 (瀏覽器可能不支援 localStorage)。";
@@ -447,8 +351,6 @@
                 apiKeyStatus.className = "text-sm mt-3 text-red-600";
             }
         }
-
-        // 載入 API 金鑰
         function loadApiKey() {
             try {
                 const storedKey = localStorage.getItem('geminiApiKey');
@@ -468,41 +370,35 @@
             }
         }
 
-        // === 錯誤處理 (v10) ===
-        
-        // 顯示錯誤 Modal
+        // === 錯誤處理 ===
         function showError(message) {
+             // v15.4 Legal: 修改未設定 API Key 時的錯誤訊息
             if (apiKey === "") {
-                errorMessage.textContent = "API 金鑰尚未設定。請在最上方的「連線設定」區塊輸入並儲存您的金鑰。";
+                errorMessage.textContent = "API 金鑰尚未設定或無效。請在最上方的「連線設定」區塊輸入並儲存您的金鑰，或檢查金鑰是否正確。";
             } else {
                 errorMessage.textContent = message || "發生未知的錯誤。";
             }
             errorModal.classList.remove('hidden');
         }
-
-        // 隱藏錯誤 Modal
         closeModalButton.addEventListener('click', () => {
             errorModal.classList.add('hidden');
         });
 
-        // === 核心 API 呼叫 (v14.2) ===
+        // === 核心 API 呼叫 ===
         async function callGeminiAPI(systemPrompt, userPrompt, useSearch = true) {
             if (apiKey === "") {
                 throw new Error("API 金鑰尚未設定。");
             }
             
             let retries = 3;
-            let delay = 1000; // 1 秒
+            let delay = 1000;
 
             const payload = {
                 contents: [{ parts: [{ text: userPrompt }] }],
-                systemInstruction: {
-                    parts: [{ text: systemPrompt }]
-                },
+                systemInstruction: { parts: [{ text: systemPrompt }] },
                 tools: useSearch ? [{ "google_search": {} }] : []
             };
             
-            // v14.2: 動態組合 API URL (已移除模型選擇)
             const apiUrl = `${apiUrlBase}${modelName}:generateContent?key=${apiKey}`;
 
             while (retries > 0) {
@@ -521,11 +417,10 @@
                             if (errorBody.includes("API key not valid")) {
                                 errorBody = "API 金鑰無效。請檢查您的金鑰是否正確，或重新產生一把。";
                             }
-                            // (v14.1b) 處理 404 錯誤
                             if (response.status === 404 && errorBody.includes("not found")) {
                                 errorBody = `模型名稱 "${modelName}" 未找到或不支援。 (HTTP 404)`;
                             }
-                        } catch (e) { /* 忽略解析錯誤 */ }
+                        } catch (e) { /* 忽略 */ }
                         throw new Error(`HTTP 錯誤! 狀態: ${response.status}. 詳情: ${errorBody}`);
                     }
 
@@ -547,7 +442,6 @@
                                     .filter(source => source.uri && source.title);
                             }
                         }
-
                         return { text, sources };
                     } else {
                         console.error("API 回應格式錯誤或無內容:", result);
@@ -561,7 +455,6 @@
                         }
                         throw new Error(errorMsg);
                     }
-
                 } catch (error) {
                     console.error(`API 呼叫失敗 (剩下 ${retries - 1} 次重試):`, error);
                     retries--;
@@ -575,43 +468,32 @@
         }
 
         // === 事件監聽器 ===
-        
-        // 頁面載入
         document.addEventListener('DOMContentLoaded', loadApiKey);
-        
-        // 儲存 API 金鑰
         saveApiKeyButton.addEventListener('click', saveApiKey);
 
-        // (v10) 查詢指引按鈕
         queryGuidelinesButton.addEventListener('click', async () => {
             if (apiKey === "") {
                 showError("請先設定 API 金鑰。");
                 return;
             }
-
             guidelineSpinner.classList.remove('hidden');
             queryGuidelinesButton.disabled = true;
             queryGuidelinesButton.classList.add('opacity-70', 'cursor-not-allowed');
-            guidelineList.innerHTML = ''; // 清空舊列表
+            guidelineList.innerHTML = ''; 
             guidelineListContainer.classList.add('hidden');
 
             const guidelineQueryPrompt = `您是一位 AI 助手，任務是使用 Google 搜尋來**即時查核**以下常見臨床指引的「最新發布年份」。
-
 您的回覆必須嚴格遵守以下格式，僅回傳列表，不要有任何前言或結語：
 * [指引名稱] (例如：GINA - Asthma) - [最新年份]
 * [指引名稱] (例如：GOLD - COPD) - [最新年份]
 * [指引名稱] (例如：AHA/ACC - Hypertension) - [最新年份]
 * [指引名稱] (例如：Surviving Sepsis Campaign) - [最新年份]
 * [指引名稱] (例如：IDSA - Skin and Soft Tissue Infections) - [最新年份]
-* [指引名稱] (例如：KDIGO - CKD) - [最新年份]
-`;
-
+* [指引名稱] (例如：KDIGO - CKD) - [最新年份]`;
             const userPrompt = "請立即使用 Google 搜尋，幫我查詢 GINA (Asthma), GOLD (COPD), AHA/ACC (Hypertension), Surviving Sepsis Campaign, IDSA (Skin and Soft Tissue Infections), 以及 KDIGO (CKD) 的最新指引發布年份。";
 
             try {
-                // (v14.2) 更新 API 呼叫 (不使用 Search)
                 const { text } = await callGeminiAPI(guidelineQueryPrompt, userPrompt, true);
-                
                 const lines = text.split('\n').filter(line => line.trim().length > 0);
                 if (lines.length > 0) {
                     lines.forEach(line => {
@@ -623,7 +505,6 @@
                 } else {
                     throw new Error("AI 未返回有效的列表。");
                 }
-
             } catch (error) {
                 console.error("查詢指引時發生錯誤:", error);
                 guidelineList.innerHTML = `<li class="text-red-600">查詢失敗：${error.message}</li>`;
@@ -635,8 +516,6 @@
             }
         });
 
-
-        // (v14) 產生 SOAP 筆記按鈕
         generateButton.addEventListener('click', async () => {
             if (apiKey === "") {
                 showError("請先設定 API 金鑰。");
@@ -645,7 +524,6 @@
             
             const patientInfo = patientInfoInput.value;
             const specialtyFocus = specialtyFocusSelect.value;
-            // (v15.2) 取得獨立的資料庫資訊
             const uptodateInfo = uptodateInfoInput.value.trim();
             const micromedexInfo = micromedexInfoInput.value.trim();
             const openevidenceInfo = openevidenceInfoInput.value.trim();
@@ -655,9 +533,8 @@
                 return;
             }
 
-            // UI 載入狀態
             progressBarContainer.style.display = 'block';
-            placeholderDiv.classList.add('animate-pulse'); // v15 UI: 啟動脈衝
+            placeholderDiv.classList.add('animate-pulse');
             generateButton.disabled = true;
             generateButton.classList.add('opacity-70', 'cursor-not-allowed');
             clearInputsButton.disabled = true;
@@ -668,11 +545,9 @@
             sourcesContainer.classList.add('hidden');
             sourcesList.innerHTML = '';
             sourcesTitle.textContent = '引用的指引與參考來源：';
-            copyButton.disabled = true; // (v14) 禁用複製按鈕
+            copyButton.disabled = true;
 
-            // (v15.2) 更新系統提示
             const systemPrompt = `您是一位頂尖的臨床藥師，擁有豐富的經驗，並且隨時掌握最新的國際醫療指引。
-
 您的任務是 (v15.4)：
 1.  仔細分析使用者在 [病患核心資料] 中提供的資訊 (病史、Lab、用藥等)。
 2.  自動識別出最相關的主要病症。
@@ -691,7 +566,6 @@
     * **必須包含**對腎功能 (eGFR) 的考量與劑量評估。
 10. 在您的「Plan (P)」部分：
     * 您的所有建議都必須**符合**您在 (A) 中提到的最新指引。
-
 11. (*** v14 格式要求 ***)
     * 您的回覆**必須**嚴格遵守此格式：
     [完整的 SOAP 筆記 (S, O, A, P)]
@@ -702,36 +576,21 @@
     * (v15.2) [若有使用 UpToDate, 請註明]
     * (v15.2) [若有使用 Micromedex, 請註明]
     * (v15.2) [若有使用 OpenEvidence, 請註明]
-
 12. (*** v14.4 格式禁止 ***)
-    * **禁止**在您的回覆中使用任何 LaTeX 語法 (例如 $...$ 或 $$...$$ 或 \text{})。
+    * **禁止**在您的回覆中使用任何 LaTeX 語法 (例如 $...$ 或 $$...$$ 或 \\text{})。
     * 必須直接使用 Unicode 字元 (例如：β, α, °, ≈, mmHg)。`;
 
-
-            // (v15.2) 動態組合 User Prompt
             let userPrompt = `--- 病患核心資料 (必填) START ---
 ${patientInfo}
 --- 病患核心資料 END ---
 `;
-
-            if (specialtyFocus) {
-                userPrompt += `\n--- 專科焦點 (選填) ---\n${specialtyFocus}\n`;
-            }
-            if (uptodateInfo) {
-                userPrompt += `\n--- UpToDate 資料 (選填) START ---\n${uptodateInfo}\n--- UpToDate 資料 END ---\n`;
-            }
-            if (micromedexInfo) {
-                userPrompt += `\n--- Micromedex 資料 (選填) START ---\n${micromedexInfo}\n--- Micromedex 資料 END ---\n`;
-            }
-            if (openevidenceInfo) {
-                userPrompt += `\n--- OpenEvidence 資料 (選填) START ---\n${openevidenceInfo}\n--- OpenEvidence 資料 END ---\n`;
-            }
-
+            if (specialtyFocus) { userPrompt += `\n--- 專科焦點 (選填) ---\n${specialtyFocus}\n`; }
+            if (uptodateInfo) { userPrompt += `\n--- UpToDate 資料 (選填) START ---\n${uptodateInfo}\n--- UpToDate 資料 END ---\n`; }
+            if (micromedexInfo) { userPrompt += `\n--- Micromedex 資料 (選填) START ---\n${micromedexInfo}\n--- Micromedex 資料 END ---\n`; }
+            if (openevidenceInfo) { userPrompt += `\n--- OpenEvidence 資料 (選填) START ---\n${openevidenceInfo}\n--- OpenEvidence 資料 END ---\n`; }
             userPrompt += `\n請根據上述所有資訊，使用最新的國際指引產生一份藥師 SOAP 筆記。`;
 
-
             try {
-                // (v14.2) 更新 API 呼叫 (使用 Search)
                 const { text, sources } = await callGeminiAPI(systemPrompt, userPrompt, true); 
                 
                 const delimiter = '---GUIDELINES_USED---';
@@ -745,14 +604,10 @@ ${patientInfo}
                     guidelinesText = parts[1].trim();
                 }
                 
-                // (v14.4 FIX) 強制清除 LaTeX 語法與轉換
-                // 移除 $$...$$ (顯示數學)
+                // (v15.4 HTML 處理邏輯 - 保持不變)
                 soapNote = soapNote.replace(/\$\$(.*?)\$\$/g, '$1');
-                // 移除 $...$ (行內數學)
                 soapNote = soapNote.replace(/\$(.*?)\$/g, '$1');
-                // 轉換 \text{...}
                 soapNote = soapNote.replace(/\\text\{(.*?)\}/g, '$1');
-                // 轉換常見符號
                 soapNote = soapNote.replace(/\\beta/g, 'β');
                 soapNote = soapNote.replace(/\\alpha/g, 'α');
                 soapNote = soapNote.replace(/\\gamma/g, 'γ');
@@ -761,22 +616,15 @@ ${patientInfo}
                 soapNote = soapNote.replace(/\\circ/g, '°');
                 soapNote = soapNote.replace(/\\textdegree/g, '°');
                 soapNote = soapNote.replace(/\\mmHg/g, 'mmHg');
-                // 清除殘留的斜線和括號
-                soapNote = soapNote.replace(/\\/g, ''); // 移除所有反斜線
-                soapNote = soapNote.replace(/\{/g, ''); // 移除殘留括號
-                soapNote = soapNote.replace(/\}/g, ''); // 移除殘留括號
+                soapNote = soapNote.replace(/\\/g, ''); 
+                soapNote = soapNote.replace(/\{/g, '');
+                soapNote = soapNote.replace(/\}/g, '');
                 
-                // (v14.3) 處理粗體和換行
-                // 1. 將 \n 轉為 <br>
-                // 2. 將 **text** 轉為 <strong>text</strong>
-                // 3. (v14.4) 先 escape HTML，避免 XSS
                 let safeHtml = soapNote
                     .replace(/</g, "&lt;")
                     .replace(/>/g, "&gt;");
-                
                 safeHtml = safeHtml.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
 
-                // (v14.3) 使用 <pre> 標籤來保留換行和空白，並套用字體
                 outputDiv.innerHTML = `<pre>${safeHtml}</pre>`;
                 
                 outputDiv.classList.remove('hidden');
@@ -807,7 +655,7 @@ ${patientInfo}
                         a.href = source.uri;
                         a.target = '_blank';
                         a.rel = 'noopener noreferrer';
-                        a.className = 'text-blue-600 hover:underline'; // v15.1 UI: 修改顏色
+                        a.className = 'text-blue-600 hover:underline';
                         a.textContent = source.title || '相關參考文件';
                         li.appendChild(a);
                         sourcesList.appendChild(li);
@@ -819,27 +667,24 @@ ${patientInfo}
                     sourcesContainer.classList.remove('hidden');
                 }
                 
-                copyButton.disabled = false; // (v14) 啟用複製按鈕
+                copyButton.disabled = false;
 
             } catch (error) {
                 console.error("產生 SOAP 筆記時發生錯誤:", error);
                 showError(`無法產生筆記：${error.message}`);
                 copyButton.disabled = true;
             } finally {
-                // UI 結束載入
                 progressBarContainer.style.display = 'none';
-                placeholderDiv.classList.remove('animate-pulse'); // v15 UI: 停止脈衝
+                placeholderDiv.classList.remove('animate-pulse');
                 generateButton.disabled = false;
                 generateButton.classList.remove('opacity-70', 'cursor-not-allowed');
                 clearInputsButton.disabled = false;
             }
         });
 
-        // (v14) 一鍵清除按鈕
         clearInputsButton.addEventListener('click', () => {
             patientInfoInput.value = '';
             specialtyFocusSelect.value = '';
-            // (v15.2) 清除獨立的資料庫欄位
             uptodateInfoInput.value = '';
             micromedexInfoInput.value = '';
             openevidenceInfoInput.value = '';
@@ -852,27 +697,24 @@ ${patientInfo}
             copyButton.disabled = true;
         });
 
-        // (v14.1c) 一鍵複製按鈕 (使用 execCommand)
         copyButton.addEventListener('click', () => {
-            const textToCopy = outputDiv.textContent || outputDiv.innerText;
+            // v16.1 修正: 從 <pre> 複製
+            const preElement = outputDiv.querySelector('pre');
+            const textToCopy = preElement ? (preElement.textContent || preElement.innerText) : '';
 
             if (!textToCopy) {
                 showError("沒有內容可以複製。");
                 return;
             }
-
-            // 創建一個臨時的 textarea 來執行複製
             const textArea = document.createElement("textarea");
             textArea.value = textToCopy;
-            textArea.style.position = "fixed";  // 避免滾動
+            textArea.style.position = "fixed";
             textArea.style.top = "0";
             textArea.style.left = "0";
-            textArea.style.opacity = "0"; // 隱藏
+            textArea.style.opacity = "0";
             document.body.appendChild(textArea);
-            
             textArea.focus();
             textArea.select();
-
             try {
                 const successful = document.execCommand('copy');
                 if (successful) {
@@ -885,18 +727,15 @@ ${patientInfo}
                 console.error("複製失敗: ", err);
                 showError(`複製失敗：${err.message}`);
             }
-
             document.body.removeChild(textArea);
         });
-
     </script>
 
-    <!-- v15.4: 更新頁尾文字與連結 -->
     <footer class="text-center py-6 mt-8 border-t border-gray-200">
         <p class="text-sm text-gray-500">
             本工具原始碼與更新版可於 
-            <a href="https://github.com/Almightyhao/SOAP-writter" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
-                https://github.com/Almightyhao/SOAP-writter
+            <a href="https://github.com/Almightyhao/Google-SOAP-writter" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">
+                https://github.com/Almightyhao/Google-SOAP-writter
             </a>
              查找
         </p>
@@ -904,4 +743,3 @@ ${patientInfo}
 
 </body>
 </html>
-
