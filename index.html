@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能藥師 SOAP小幫手 (v16.1 - 整合計算機)</title>
+    <title>智能藥師 SOAP小幫手 (v16.2 - 自動計算)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -46,7 +46,6 @@
             margin-top: 0.5rem; /* mt-2 */
             line-height: 1.6; /* leading-relaxed */
         }
-        /* v16.0: 計算機按鈕樣式 */
         .calc-button {
             background-color: #10b981; /* bg-emerald-500 */
             color: white;
@@ -59,7 +58,6 @@
         .calc-button:hover {
             background-color: #059669; /* hover:bg-emerald-600 */
         }
-        /* v16.0: 計算機結果樣式 */
         .calc-result {
             font-weight: 700;
             color: #1d4ed8; /* text-blue-700 */
@@ -67,7 +65,14 @@
             text-align: right;
             min-height: 28px; /* 確保有高度 */
         }
-        /* v16.0: 計算機標籤樣式 */
+        /* v16.2: "無資料計算" 的樣式 */
+        .calc-result-nodata {
+            font-weight: 500;
+            color: #9ca3af; /* text-gray-400 */
+            font-size: 0.9rem; /* text-sm */
+            text-align: right;
+            min-height: 28px;
+        }
         .calc-label {
             display: block;
             text-sm;
@@ -100,7 +105,6 @@
             border-color: #3b82f6;
             box-shadow: 0 0 0 2px #bfdbfe;
         }
-        /* v16.1: Child-Pugh Radio 樣式 */
         .calc-radio-group {
             display: flex;
             flex-wrap: wrap;
@@ -129,7 +133,7 @@
 
     <div class="container mx-auto max-w-6xl p-4 py-8">
         <header class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">智能藥師 SOAP小幫手 (v16.1)</h1>
+            <h1 class="text-3xl md:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">智能藥師 SOAP小幫手 (v16.2)</h1>
             <p class="mt-2 text-lg text-gray-600">AI 驅動的指引查核、DDI 分析與筆記草稿</p>
         </header>
 
@@ -444,9 +448,9 @@
                 <div class="mb-4">
                     <label for="patientInfo" class="block text-sm font-medium text-gray-600 mb-2">
                         病患核心資料 (必填)
-                        <span class="text-xs text-gray-500">(例如：主訴、病史、診斷、Lab、用藥...)</span>
+                        <span class="text-xs text-gray-500">(例如：Age: 70, Sex: M, BW: 60kg, SCr: 1.2...)</span>
                     </label>
-                    <textarea id="patientInfo" rows="10" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="請貼入「去識別化」後的病患資訊... (如果未使用上方計算機，AI 會嘗試從這裡抓取 eGFR/Cr/Age 等資訊)"></textarea>
+                    <textarea id="patientInfo" rows="10" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="請貼入「去識別化」後的病患資訊... (v16.2: 若計算機空白，AI 分析時將自動嘗試從此處抓取 Age/Sex/BW/Height/SCr 並計算)"></textarea>
                 </div>
 
                 <div class="mb-4">
@@ -466,6 +470,13 @@
                         整合 OpenEvidence (選填)
                     </label>
                     <textarea id="openevidenceInfo" rows="4" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="貼上 OpenEvidence 的重點..."></textarea>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="nhiGuidelinesInfo" class="block text-sm font-medium text-gray-600 mb-2">
+                        整合健保給付規範 (選填)
+                    </label>
+                    <textarea id="nhiGuidelinesInfo" rows="4" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="貼上相關藥品的健保給付規範..."></textarea>
                 </div>
 
                 <div class="mt-auto pt-4">
@@ -495,9 +506,9 @@
                      <ul class="list-disc list-inside text-left mt-2 text-sm">
                          <li>分析病歷並識別主要問題。</li>
                          <li>即時上網搜尋最新的國際指引 (GINA, GOLD...)。</li>
-                         <li>評估 DDI 與重複用藥。</li>
-                         <li>(v16.1) 整合您在左側計算的 CrCl, IBW/ABW, CHA₂DS₂-VASc, BSA, CKD-EPI, Child-Pugh 結果。</li>
-                         <li>(v15.2) 整合您提供的 UpToDate/Micromedex/OpenEvidence 重點。</li>
+                         <li>(v16.2) **自動核對您提供的「健保給付規範」**，評估核刪風險。</li>
+                         <li>(v16.2) **自動回填計算：** 若 CrCl/eGFR/BSA 空白，將嘗試從病歷中抓取資料計算。</li>
+                         <li>整合 DDI、重複用藥、UpToDate/Micromedex 等所有資訊。</li>
                      </ul>
                      <p class="text-sm mt-4">所有內容均需由專業藥師最終審核。</p>
                  </div>
@@ -505,12 +516,12 @@
                  <div id="output" class="hidden prose max-w-none prose-pre:whitespace-pre-wrap bg-gray-50 p-4 rounded-lg border border-gray-200" style="min-height: 200px;"></div>
 
                  <div id="infoBox" class="hidden mt-4 bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg">
-                     <h4 class="font-bold text-sm">AI 輔助說明 (v16.1)：</h4>
+                     <h4 class="font-bold text-sm">AI 輔助說明 (v16.2)：</h4>
                      <ul class="list-disc list-inside text-sm mt-1">
+                         <li><strong>健保核對：</strong> (新) AI 已被指示**必須**核對您提供的健保規範，並在 (A) 中評估。</li>
+                         <li><strong>自動計算：</strong> (新) AI 分析時，已自動從您的病歷中抓取資料，回填 CrCl/eGFR/BSA 計算值。</li>
                          <li><strong>最新指引：</strong> AI 已被指示在「Assessment」中<strong>必須註明</strong>所參考指引的<strong>「實際年份」</strong>與<strong>「原文句子」</strong>。</li>
                          <li><strong>DDI 分析：</strong> 藥物交互作用 (DDI) 評估已使用 Gemini 深度研究功能完成。</li>
-                         <li><strong>資料庫整合：</strong> AI 已整合您提供的 UpToDate/Micromedex/OpenEvidence 資訊。</li>
-                         <li><strong>公式整合：</strong> AI 已整合您使用本 App 計算的 CrCl, IBW/ABW, CHA₂DS₂-VASc, BSA, CKD-EPI, Child-Pugh 評估。</li>
                          <li><strong>專業審核：</strong> 內容僅供參考，請務必由您進行最終的專業審核與修改。</li>
                      </ul>
                  </div>
@@ -603,6 +614,8 @@
         const micromedexInfoInput = document.getElementById('micromedexInfo');
         const openevidenceInfoInput = document.getElementById('openevidenceInfo');
         const termsCheckbox = document.getElementById('termsCheckbox');
+        // v16.2: 新增健保 DOM
+        const nhiGuidelinesInfoInput = document.getElementById('nhiGuidelinesInfo');
 
         // v16.0: CrCl & IBW/ABW 計算機 DOM
         const calcSex = document.getElementById('calcSex');
@@ -665,7 +678,7 @@
 
         // === 全域變數 ===
         let apiKey = "";
-        const modelName = "gemini-2.5-flash-preview-09-2025";
+        const modelName = "gemini-1.5-flash-latest"; // v16.2: 使用 1.5-flash
         const apiUrlBase = "https://generativelanguage.googleapis.com/v1beta/models/";
 
         // === API 金鑰處理 ===
@@ -721,7 +734,19 @@
             errorModal.classList.add('hidden');
         });
 
-        // === v16.1: 計算機邏輯 ===
+        // === v16.2: 計算機邏輯 ===
+
+        // v16.2: Helper function to set result text
+        function setCalcResult(element, text, value, isNoData = false) {
+            element.textContent = text;
+            element.dataset.value = value;
+            if (isNoData) {
+                element.className = 'calc-result-nodata block';
+            } else if (text) {
+                element.className = 'calc-result block';
+            }
+        }
+
 
         // 1. CrCl & IBW/ABW (C-G)
         function calculateCrClAndBw() {
@@ -736,12 +761,11 @@
 
             // 1. Calculate CrCl (Cockcroft-Gault)
             if (!isNaN(age) && !isNaN(weight) && !isNaN(scr) && scr > 0) {
-                // 使用 C-G 公式的體重選擇邏輯
                 let weightForCrCl = weight; // 預設使用 ABW
                 
                 if (!isNaN(height)) {
                     let ibw = (sex === 'Male') ? (50 + 2.3 * (height * 0.393701 - 60)) : (45.5 + 2.3 * (height * 0.393701 - 60));
-                    if (ibw < 0) ibw = (sex === 'Male') ? 50 : 45.5; // 身高低於 152.4cm 的簡易處理
+                    if (ibw < 0) ibw = (sex === 'Male') ? 50 : 45.5; 
                     
                     if (weight < ibw) {
                         weightForCrCl = weight; // 體重過輕
@@ -757,58 +781,42 @@
                     crcl *= 0.85;
                 }
                 const crclVal = `${crcl.toFixed(1)} mL/min`;
-                crclResult.textContent = `CrCl (C-G): ${crclVal}`;
-                crclResult.dataset.value = crclVal; // Store for prompt
+                setCalcResult(crclResult, `CrCl (C-G): ${crclVal}`, crclVal);
                 crclCalculated = true;
             } else {
-                crclResult.textContent = "";
-                crclResult.dataset.value = "";
+                if (crclResult.dataset.value === "") { // v16.2: 僅在尚未自動計算時清除
+                    setCalcResult(crclResult, "", "");
+                }
             }
 
-            // 2. Calculate IBW/ABW 評估 (v16.0 邏輯)
+            // 2. Calculate IBW/ABW 評估
             if (!isNaN(height) && !isNaN(weight)) {
                 let ibw = (sex === 'Male') ? (50 + 2.3 * (height * 0.393701 - 60)) : (45.5 + 2.3 * (height * 0.393701 - 60));
                 if (ibw < 0) ibw = (sex === 'Male') ? 50 : 45.5;
 
-                const upperLimit = ibw * 1.2; // 20% 閾值
-                let assessment = "";
-                if (weight > upperLimit) {
-                    assessment = "位於ABW範圍內 (TBW/IBW > 1.2)";
-                } else {
-                    assessment = "未進入ABW範圍 (TBW/IBW ≤ 1.2)";
-                }
+                const upperLimit = ibw * 1.2;
+                let assessment = (weight > upperLimit) ? "位於ABW範圍內 (TBW/IBW > 1.2)" : "未進入ABW範圍 (TBW/IBW ≤ 1.2)";
                 
                 const bwVal = `IBW: ${ibw.toFixed(1)} kg. 評估: ${assessment}`;
-                bwResult.textContent = bwVal;
-                bwResult.dataset.value = bwVal; // Store for prompt
+                setCalcResult(bwResult, bwVal, bwVal);
                 bwCalculated = true;
             } else {
-                bwResult.textContent = "";
-                bwResult.dataset.value = "";
+                 if (bwResult.dataset.value === "") { // v16.2: 僅在尚未自動計算時清除
+                    setCalcResult(bwResult, "", "");
+                }
             }
 
             if (!crclCalculated && !bwCalculated && (isNaN(age) || isNaN(weight) || isNaN(scr) || isNaN(height))) {
-                crclResult.textContent = "請輸入必填欄位";
+                setCalcResult(crclResult, "請輸入必填欄位", "", true);
             }
         }
 
         // 2. CHA₂DS₂-VASc
         function calculateCha2ds2vasc() {
             let score = 0;
-
-            // Age
-            if (c2vAgeGreater75.checked) {
-                score += 2;
-            } else if (c2vAge65_74.checked) {
-                score += 1;
-            }
-
-            // Sex
-            if (c2vSexFemale.checked) {
-                score += 1;
-            }
-
-            // Comorbidities
+            if (c2vAgeGreater75.checked) score += 2;
+            else if (c2vAge65_74.checked) score += 1;
+            if (c2vSexFemale.checked) score += 1;
             if (c2vChf.checked) score += 1;
             if (c2vHt.checked) score += 1;
             if (c2vDm.checked) score += 1;
@@ -816,8 +824,7 @@
             if (c2vVd.checked) score += 1;
 
             const scoreVal = `${score} 分`;
-            cha2ds2vascResult.textContent = `Score: ${scoreVal}`;
-            cha2ds2vascResult.dataset.value = scoreVal; // Store for prompt
+            setCalcResult(cha2ds2vascResult, `Score: ${scoreVal}`, scoreVal);
         }
 
         // 3. BSA (Mosteller)
@@ -828,11 +835,9 @@
             if (!isNaN(weight) && !isNaN(height) && weight > 0 && height > 0) {
                 const bsa = Math.sqrt((height * weight) / 3600);
                 const bsaVal = `${bsa.toFixed(2)} m²`;
-                calcBsaResult.textContent = `BSA: ${bsaVal}`;
-                calcBsaResult.dataset.value = bsaVal;
+                setCalcResult(calcBsaResult, `BSA: ${bsaVal}`, bsaVal);
             } else {
-                calcBsaResult.textContent = "請輸入身高/體重";
-                calcBsaResult.dataset.value = "";
+                setCalcResult(calcBsaResult, "請輸入身高/體重", "", true);
             }
         }
 
@@ -843,8 +848,7 @@
             const sex = calcSex.value;
 
             if (isNaN(age) || isNaN(scr) || scr <= 0) {
-                calcCkdEpiResult.textContent = "請輸入年齡/SCr";
-                calcCkdEpiResult.dataset.value = "";
+                setCalcResult(calcCkdEpiResult, "請輸入年齡/SCr", "", true);
                 return;
             }
 
@@ -855,8 +859,7 @@
             let eGFR = 142 * Math.pow(Math.min(scr / kappa, 1), alpha) * Math.pow(Math.max(scr / kappa, 1), -1.200) * Math.pow(0.9938, age) * sexFactor;
             
             const eGFRVal = `${eGFR.toFixed(1)} mL/min/1.73m²`;
-            calcCkdEpiResult.textContent = `eGFR (CKD-EPI): ${eGFRVal}`;
-            calcCkdEpiResult.dataset.value = eGFRVal;
+            setCalcResult(calcCkdEpiResult, `eGFR (CKD-EPI): ${eGFRVal}`, eGFRVal);
         }
 
         // 5. Child-Pugh Score
@@ -869,17 +872,92 @@
             score += parseInt(document.querySelector('input[name="cpInr"]:checked').value);
 
             let grade = "";
-            if (score >= 5 && score <= 6) {
-                grade = "A (5-6 分)";
-            } else if (score >= 7 && score <= 9) {
-                grade = "B (7-9 分)";
-            } else if (score >= 10 && score <= 15) {
-                grade = "C (10-15 分)";
-            }
+            if (score >= 5 && score <= 6) grade = "A (5-6 分)";
+            else if (score >= 7 && score <= 9) grade = "B (7-9 分)";
+            else if (score >= 10 && score <= 15) grade = "C (10-15 分)";
 
             const scoreVal = `Child-Pugh: ${grade}`;
-            calcChildPughResult.textContent = scoreVal;
-            calcChildPughResult.dataset.value = scoreVal;
+            setCalcResult(calcChildPughResult, scoreVal, scoreVal);
+        }
+
+        // v16.2: 自動從病歷中解析資料
+        function parsePatientInfo(text) {
+            const parsed = {
+                age: null,
+                sex: null,
+                weight: null,
+                height: null,
+                scr: null
+            };
+
+            // 輔助函式
+            const findVal = (regex) => {
+                const match = text.match(regex);
+                return match ? parseFloat(match[1]) : null;
+            };
+
+            const findSex = (regex) => {
+                const match = text.match(regex);
+                if (!match) return null;
+                const sexVal = match[1].toLowerCase();
+                if (sexVal.startsWith('m') || sexVal === '男') return 'Male';
+                if (sexVal.startsWith('f') || sexVal === '女') return 'Female';
+                return null;
+            };
+
+            // 解析 (寬鬆比對)
+            parsed.age = findVal(/(?:age|年齡)\s*[:：\s]\s*(\d{1,3})/i);
+            if (!parsed.age) parsed.age = findVal(/(\d{1,3})\s*y\s*\/?\s*o/i); // 70 y/o
+
+            parsed.sex = findSex(/(?:sex|性別)\s*[:：\s]\s*(M|F|Male|Female|男|女)/i);
+
+            parsed.weight = findVal(/(?:weight|BW|體重)\s*[:：\s]\s*(\d{1,3}(?:\.\d{1,2})?)\s*k?g?/i);
+            
+            parsed.height = findVal(/(?:height|身高)\s*[:：\s]\s*(\d{1,3}(?:\.\d{1,2})?)\s*c?m?/i);
+            
+            parsed.scr = findVal(/(?:SCr|Crea|Creatinine|Cr)\s*[:：\s]\s*(\d{1,2}(?:\.\d{1,3})?)/i);
+
+            return parsed;
+        }
+
+        // v16.2: 執行自動計算
+        function autoCalculateFromParsedData(parsedData) {
+            // 標記是否成功填入
+            let autoFilled = false;
+            
+            // 1. 自動填入 CrCl, eGFR, BSA 的輸入欄位
+            if (parsedData.age && !calcAge.value) { calcAge.value = parsedData.age; autoFilled = true; }
+            if (parsedData.sex && !calcSex.value) { calcSex.value = parsedData.sex; autoFilled = true; }
+            if (parsedData.weight && !calcWeight.value) { calcWeight.value = parsedData.weight; autoFilled = true; }
+            if (parsedData.height && !calcHeight.value) { calcHeight.value = parsedData.height; autoFilled = true; }
+            if (parsedData.scr && !calcScr.value) { calcScr.value = parsedData.scr; autoFilled = true; }
+
+            // 2. 檢查 CrCl / BW
+            if (!crclResult.dataset.value && !bwResult.dataset.value) {
+                if (parsedData.age && parsedData.weight && parsedData.scr && parsedData.sex) {
+                    calculateCrClAndBw(); // 使用已填入的值計算
+                } else {
+                    setCalcResult(crclResult, "無資料計算 (缺 Age/BW/SCr/Sex)", "", true);
+                }
+            }
+
+            // 3. 檢查 BSA
+            if (!calcBsaResult.dataset.value) {
+                if (parsedData.weight && parsedData.height) {
+                    calculateBsa(); // 使用已填入的值計算
+                } else {
+                    setCalcResult(calcBsaResult, "無資料計算 (缺 BW/Height)", "", true);
+                }
+            }
+            
+            // 4. 檢查 CKD-EPI
+            if (!calcCkdEpiResult.dataset.value) {
+                if (parsedData.age && parsedData.scr && parsedData.sex) {
+                    calculateCkdEpi(); // 使用已填入的值計算
+                } else {
+                    setCalcResult(calcCkdEpiResult, "無資料計算 (缺 Age/SCr/Sex)", "", true);
+                }
+            }
         }
 
 
@@ -1053,8 +1131,24 @@
             const uptodateInfo = uptodateInfoInput.value.trim();
             const micromedexInfo = micromedexInfoInput.value.trim();
             const openevidenceInfo = openevidenceInfoInput.value.trim();
+            // v16.2: 獲取健保資料
+            const nhiGuidelinesInfo = nhiGuidelinesInfoInput.value.trim();
             
-            // v16.1: 獲取 "計算後" 的值
+            if (!patientInfo.trim()) {
+                showError("請輸入「病患核心資料」。");
+                return;
+            }
+
+            // v16.2: 執行自動計算
+            try {
+                const parsedData = parsePatientInfo(patientInfo);
+                autoCalculateFromParsedData(parsedData);
+            } catch (e) {
+                console.error("自動計算時發生錯誤:", e);
+                // 不阻斷執行，繼續
+            }
+
+            // v16.2: 獲取 "計算後" (可能來自手動或自動) 的值
             const crcl = crclResult.dataset.value || "";
             const bwAssessment = bwResult.dataset.value || "";
             const cha2ds2Score = cha2ds2vascResult.dataset.value || "";
@@ -1062,10 +1156,6 @@
             const ckdEpi = calcCkdEpiResult.dataset.value || "";
             const childPugh = calcChildPughResult.dataset.value || "";
 
-            if (!patientInfo.trim()) {
-                showError("請輸入「病患核心資料」。");
-                return;
-            }
 
             progressBarContainer.style.display = 'block';
             placeholderDiv.classList.add('animate-pulse');
@@ -1081,10 +1171,10 @@
             sourcesTitle.textContent = '引用的指引與參考來源：';
             copyButton.disabled = true;
 
-            // v16.1: 更新 System Prompt
+            // v16.2: 更新 System Prompt
             const systemPrompt = `您是一位頂尖的臨床藥師，擁有豐富的經驗，並且隨時掌握最新的國際醫療指引。
 
-您的任務是 (v16.1)：
+您的任務是 (v16.2)：
 1.  仔細分析使用者在 [病患核心資料] 中提供的資訊 (病史、Lab、用藥等)。
 2.  自動識別出最相關的主要病症。
 3.  (最重要) **使用 Google 搜尋來查找並確認**該病症**「實際的最新指引版本和年份」**。
@@ -1106,28 +1196,33 @@
 4.  (重要) **請分析**病患目前用藥清單中的**潛在藥物交互作用 (DDI)** 或**重複用藥 (Duplicate Therapy)**。您可以使用 Google 搜尋來輔助驗證。
 5.  (v14.1) 如果使用者提供了 [專科焦點] (例如 "心臟內科")，您的評估應更側重於該領域，並**優先參考該領域的權威指引** (如 ACC/AHA)。
 
-6.  (v16.1) 使用者已在 App 中使用計算機，並在 [APP計算結果] 欄位提供了「已算出的值」。您**必須**將這些「計算結果」整合到您的 (O) 客觀資料或 (A) 評估中。
-    * **備援邏輯：** 如果 [APP計算結果] 欄位為空 (代表使用者未計算)，您才需要像以前一樣，自行從 [病患核心資料] 中抓取 eGFR, Lab, Age 等資訊來進行評估。
+6.  (v16.2) 使用者已在 App 中使用計算機 (或由系統自動回填)，並在 [APP計算結果] 欄位提供了「已算出的值」。您**必須**將這些「計算結果」整合到您的 (O) 客觀資料或 (A) 評估中。
+    * **備援邏輯：** 如果 [APP計算結果] 欄位為空 (代表使用者未計算，且系統也無法自動解析)，您才需要像以前一樣，自行從 [病患核心資料] 中抓取 eGFR, Lab, Age 等資訊來進行評估。
 
-7.  (v15.2) 使用者可能會在 [UpToDate 資料], [Micromedex 資料], [OpenEvidence 資料] 欄位提供補充資訊。
-8.  (v15.2) 如果第 7 點的欄位「有內容」，您**必須**將這些重點整合到您的 (A) 或 (P) 中，並且**「明確註明來源」**(例如："根據 Micromedex 資料..." 或 "UpToDate 亦指出...")。如果欄位為空，則忽略。
-9.  根據「SOAP」格式，撰寫一份專業、精確、格式化的藥師筆記草稿 (保留粗體和換行)。
-10. 在您的「Assessment (A)」部分：
+7.  (v16.2 新增任務) 如果使用者在 [健保給付規範] 欄位提供了資訊，您**必須**將其作為**最高優先級**的評估項目之一。
+    * 您的任務是：**根據病患的診斷、Lab、和計算出的分數 (如 Child-Pugh, CrCl)，嚴格判斷**目前的處方是否符合這些健保規範。
+    * 必須在 (A) 或 (P) 中提出您的**明確評估** (例如："符合 OOO 藥物的健保給付條件" 或 "目前 Child-Pugh B，不符合 OOO 給付標準，恐遭核刪")。
+
+8.  (v15.2) 使用者可能會在 [UpToDate 資料], [Micromedex 資料], [OpenEvidence 資料] 欄位提供補充資訊。
+9.  (v15.2) 如果第 8 點的欄位「有內容」，您**必須**將這些重點整合到您的 (A) 或 (P) 中，並且**「明確註明來源」**(例如："根據 Micromedex 資料..." 或 "UpToDate 亦指出...")。如果欄位為空，則忽略。
+10. 根據「SOAP」格式，撰寫一份專業、精確、格式化的藥師筆記草稿 (保留粗體和換行)。
+11. 在您的「Assessment (A)」部分：
     * **(v14.1 強制)** **必須明確提及**您參考的指引名稱與**「實際年份」** (例如："根據 GINA 2024 指引...")，**且該指引應優先來自第 3.1 點的清單**。
     * **(v14.1 強制)** **必須引用**該指引中的**「精確原文句子」**來支持您的臨床決策 (例如："...GINA 2024 建議... (原文: '...')")。
     * **必須包含**您對 DDI 或重複用藥的評估。
     * **必須包含**對腎功能 (eGFR 或 您收到的 CrCl (C-G), CKD-EPI) 的考量與劑量評估。
     * **(v16.1)** **必須包含**對肝功能 (您收到的 Child-Pugh Score) 的考量與劑量評估。
     * **(v16.1)** 若提供了 BSA，應評估是否需用於化療藥物等劑量計算。
+    * **(v16.2)** **必須包含**您對健保規範的核對結果 (如果使用者有提供規範)。
 
-11. 在您的「Plan (P)」部分：
-    * 您的所有建議都必須**符合**您在 (A) 中提到的最新指引。
+12. 在您的「Plan (P)」部分：
+    * 您的所有建議都必須**符合**您在 (A) 中提到的最新指引，並且**不得違反** (A) 中提到的健保給付規範。
 
-12. (*** v16.0 體重評估邏輯 ***)
+13. (*** v16.0 體重評估邏輯 ***)
     * 如果您在 [APP計算結果] 中收到 "位於ABW範圍內" 或類似的描述，這代表病患的「實際體重」已超過「理想體重」一定比例。
     * 在這種情況下，您在 (A) 或 (P) 中評估藥物劑量時 (特別是水溶性藥物)，必須意識到**不應**直接使用實際體重 (TBW) 或理想體重 (IBW)，而應**建議**使用「調整體重 (Adjusted Body Weight, ABW)」來計算，並在筆記中提及這一點 (例如： "病患體重位於ABW範圍，建議使用 ABW (Adjusted Body Weight) 進行劑量計算..."）。
 
-13. (*** v16.1 格式要求 ***)
+14. (*** v16.2 格式要求 ***)
     * 您的回覆**必須**嚴格遵守此格式：
     [完整的 SOAP 筆記 (S, O, A, P)]
     ---GUIDELINES_USED---
@@ -1138,19 +1233,20 @@
     * (v15.2) [若有使用 Micromedex, 請註明]
     * (v15.2) [若有使用 OpenEvidence, 請註明]
     * (v16.1) [若有使用 APP計算結果 (CrCl/BW/CHA2DS2-VASc/BSA/CKD-EPI/Child-Pugh), 請註明]
+    * (v16.2) [若有使用 健保給付規範, 請註明]
 
-14. (*** v14.4 格式禁止 ***)
+15. (*** v14.4 格式禁止 ***)
     * **禁止**在您的回覆中使用任何 LaTeX 語法 (例如 $...$ 或 $$...$$ 或 \\text{})。
     * 必須直接使用 Unicode 字元 (例如：β, α, °, ≈, mmHg)。`;
 
-            // v16.1: 更新 User Prompt
+            // v16.2: 更新 User Prompt
             let userPrompt = `--- 病患核心資料 (必填) START ---
 ${patientInfo}
 --- 病患核心資料 END ---
 `;
             if (specialtyFocus) { userPrompt += `\n--- 專科焦點 (選填) ---\n${specialtyFocus}\n`; }
             
-            // v16.1: 組合計算結果
+            // v16.2: 組合計算結果
             let calcResults = "";
             if (crcl) { calcResults += `Creatine Clearance (Cockcroft-Gault): ${crcl}\n`; }
             if (ckdEpi) { calcResults += `eGFR (CKD-EPI 2021): ${ckdEpi}\n`; }
@@ -1166,6 +1262,9 @@ ${patientInfo}
             if (uptodateInfo) { userPrompt += `\n--- UpToDate 資料 (選填) START ---\n${uptodateInfo}\n--- UpToDate 資料 END ---\n`; }
             if (micromedexInfo) { userPrompt += `\n--- Micromedex 資料 (選填) START ---\n${micromedexInfo}\n--- Micromedex 資料 END ---\n`; }
             if (openevidenceInfo) { userPrompt += `\n--- OpenEvidence 資料 (選填) START ---\n${openevidenceInfo}\n--- OpenEvidence 資料 END ---\n`; }
+            // v16.2: 新增健保資料
+            if (nhiGuidelinesInfo) { userPrompt += `\n--- 健保給付規範 (選填) START ---\n${nhiGuidelinesInfo}\n--- 健保給付規範 END ---\n`; }
+            
             userPrompt += `\n請根據上述所有資訊，使用最新的國際指引產生一份藥師 SOAP 筆記。`;
 
             // console.log("System Prompt:", systemPrompt);
@@ -1264,13 +1363,14 @@ ${patientInfo}
             }
         });
 
-        // v16.1: 更新清除按鈕邏輯
+        // v16.2: 更新清除按鈕邏輯
         clearInputsButton.addEventListener('click', () => {
             patientInfoInput.value = '';
             specialtyFocusSelect.value = '';
             uptodateInfoInput.value = '';
             micromedexInfoInput.value = '';
             openevidenceInfoInput.value = '';
+            nhiGuidelinesInfoInput.value = ''; // v16.2
             
             // Clear CrCl & IBW/ABW (calc 1)
             calcSex.value = 'Male';
@@ -1278,10 +1378,8 @@ ${patientInfo}
             calcWeight.value = '';
             calcHeight.value = '';
             calcScr.value = '';
-            crclResult.textContent = '';
-            crclResult.dataset.value = '';
-            bwResult.textContent = '';
-            bwResult.dataset.value = '';
+            setCalcResult(crclResult, "", "");
+            setCalcResult(bwResult, "", "");
 
             // Clear CHA2DS2-VASc (calc 2)
             c2vAgeLess65.checked = true;
@@ -1291,16 +1389,13 @@ ${patientInfo}
             c2vDm.checked = false;
             c2vStroke.checked = false;
             c2vVd.checked = false;
-            cha2ds2vascResult.textContent = '';
-            cha2ds2vascResult.dataset.value = '';
+            setCalcResult(cha2ds2vascResult, "", "");
 
             // Clear BSA (calc 3)
-            calcBsaResult.textContent = '';
-            calcBsaResult.dataset.value = '';
+            setCalcResult(calcBsaResult, "", "");
             
             // Clear CKD-EPI (calc 4)
-            calcCkdEpiResult.textContent = '';
-            calcCkdEpiResult.dataset.value = '';
+            setCalcResult(calcCkdEpiResult, "", "");
             
             // Clear Child-Pugh (calc 5)
             document.querySelector('input[name="cpAscites"][value="1"]').checked = true;
@@ -1308,8 +1403,7 @@ ${patientInfo}
             document.querySelector('input[name="cpBili"][value="1"]').checked = true;
             document.querySelector('input[name="cpAlb"][value="1"]').checked = true;
             document.querySelector('input[name="cpInr"][value="1"]').checked = true;
-            calcChildPughResult.textContent = '';
-            calcChildPughResult.dataset.value = '';
+            setCalcResult(calcChildPughResult, "", "");
 
             termsCheckbox.checked = false;
             generateButton.disabled = true;
@@ -1368,4 +1462,3 @@ ${patientInfo}
 
 </body>
 </html>
-
