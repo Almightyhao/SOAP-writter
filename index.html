@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>智能藥師 SOAP小幫手 (v15.4 - 法律聲明)</title>
+    <!-- v16.0: 更新標題 -->
+    <title>智能藥師 SOAP小幫手 (v16.0 - 整合計算機)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* (樣式保持不變) */
         body {
             font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
         }
@@ -15,8 +15,10 @@
         .prose pre { background-color: #f9fafb; color: #1f2937; padding: 1rem; border-radius: 0.5rem; border: 1px solid #e5e7eb; white-space: pre-wrap; font-family: inherit; font-size: 0.95rem; }
         #guidelineList li { padding: 4px 0; border-bottom: 1px solid #f3f4f6; }
         #guidelineList li:last-child { border-bottom: none; }
-        details summary { cursor: pointer; font-weight: 600; color: #2563eb; }
-        details summary:hover { text-decoration: underline; }
+        details summary { cursor: pointer; font-weight: 600; color: #1f2937; background-color: #f9fafb; padding: 0.75rem 1rem; border-radius: 0.5rem; border: 1px solid #e5e7eb; transition: background-color 0.2s; }
+        details summary:hover { background-color: #f3f4f6; }
+        details[open] summary { background-color: #f3f4f6; border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+        .calculator-content { padding: 1rem; border: 1px solid #e5e7eb; border-top: 0; border-bottom-left-radius: 0.5rem; border-bottom-right-radius: 0.5rem; background-color: #ffffff; }
         .instruction-step { margin-top: 1rem; }
         .instruction-step h4 { font-weight: 600; color: #1f2937; }
         .instruction-step p { font-size: 0.95rem; color: #374151; }
@@ -24,7 +26,6 @@
         #progressBarContainer { display: none; width: 100%; background-color: #e5e7eb; border-radius: 9999px; overflow: hidden; margin-bottom: 1rem; }
         .progress-bar { width: 100%; height: 0.75rem; background-color: #3b82f6; border-radius: 9999px; animation: indeterminate-progress 2s linear infinite; }
         @keyframes indeterminate-progress { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-        /* v15.4 Legal: 使用條款區塊樣式 */
         .terms-section {
             background-color: #fffbeb; /* bg-yellow-50 */
             border: 1px solid #fcd34d; /* border-yellow-300 */
@@ -46,13 +47,68 @@
             margin-top: 0.5rem; /* mt-2 */
             line-height: 1.6; /* leading-relaxed */
         }
+        /* v16.0: 計算機按鈕樣式 */
+        .calc-button {
+            background-color: #10b981; /* bg-emerald-500 */
+            color: white;
+            font-weight: 600;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            transition: background-color 0.2s;
+        }
+        .calc-button:hover {
+            background-color: #059669; /* hover:bg-emerald-600 */
+        }
+        /* v16.0: 計算機結果樣式 */
+        .calc-result {
+            font-weight: 700;
+            color: #1d4ed8; /* text-blue-700 */
+            font-size: 1.125rem; /* text-lg */
+            text-align: right;
+            min-height: 28px; /* 確保有高度 */
+        }
+        /* v16.0: 計算機標籤樣式 */
+        .calc-label {
+            display: block;
+            text-sm;
+            font-medium;
+            color: #374151; /* text-gray-700 */
+            margin-bottom: 0.5rem;
+        }
+        .calc-input {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db; /* border-gray-300 */
+            border-radius: 0.375rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            outline: none;
+        }
+        .calc-input:focus {
+            border-color: #3b82f6; /* focus:border-blue-500 */
+            box-shadow: 0 0 0 2px #bfdbfe; /* focus:ring-blue-200 */
+        }
+        .calc-select {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            background-color: white;
+            outline: none;
+        }
+        .calc-select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px #bfdbfe;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 to-gray-100 min-h-screen text-gray-800">
 
     <div class="container mx-auto max-w-6xl p-4 py-8">
         <header class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">智能藥師 SOAP小幫手 (v15.4)</h1>
+            <!-- v16.0: 更新 H1 -->
+            <h1 class="text-3xl md:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">智能藥師 SOAP小幫手 (v16.0)</h1>
             <p class="mt-2 text-lg text-gray-600">AI 驅動的指引查核、DDI 分析與筆記草稿</p>
         </header>
 
@@ -71,7 +127,7 @@
                  </button>
              </div>
              <p id="apiKeyStatus" class="text-sm mt-3 text-gray-500">狀態：尚未設定。金鑰將儲存在您的瀏覽器 (localStorage) 中。</p>
-         </section>
+        </section>
 
         <section class="bg-white p-6 rounded-xl shadow-xl mb-6">
              <h2 class="text-2xl font-semibold mb-4 text-gray-700 flex items-center">
@@ -92,7 +148,7 @@
                  <h3 class="text-lg font-semibold text-gray-800 mb-2">即時查詢結果：</h3>
                  <ul id="guidelineList" class="text-gray-700 bg-gray-50 p-4 rounded-lg border border-gray-200"></ul>
              </div>
-         </section>
+        </section>
 
         <main class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -127,25 +183,160 @@
                     </select>
                 </div>
 
+                <!-- v16.0: 新增整合計算機 -->
+                <div class="space-y-4 mb-4">
+                    <!-- CrCl & IBW/ABW Calculator -->
+                    <details>
+                        <summary class="flex justify-between items-center">
+                            <span>1. CrCl & IBW/ABW 計算 (選填)</span>
+                            <span class="text-sm font-normal text-blue-600">點擊展開</span>
+                        </summary>
+                        <div class="calculator-content space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="calcSex" class="calc-label">性別</label>
+                                    <select id="calcSex" class="calc-select">
+                                        <option value="Male">男性</option>
+                                        <option value="Female">女性</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="calcAge" class="calc-label">年齡 (years)</label>
+                                    <input type="number" id="calcAge" class="calc-input" placeholder="例如: 70">
+                                </div>
+                                <div>
+                                    <label for="calcWeight" class="calc-label">體重 (kg)</label>
+                                    <input type="number" id="calcWeight" class="calc-input" placeholder="例如: 65">
+                                </div>
+                                <div>
+                                    <label for="calcHeight" class="calc-label">身高 (cm)</label>
+                                    <input type="number" id="calcHeight" class="calc-input" placeholder="例如: 170">
+                                </div>
+                                <div>
+                                    <label for="calcScr" class="calc-label">血清肌酸酐 (SCr, mg/dL)</label>
+                                    <input type="number" id="calcScr" class="calc-input" placeholder="例如: 1.2">
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center mt-4">
+                                <button id="calculateCrClBwButton" class="calc-button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h3m-3-10h3m6 9a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    計算 CrCl & IBW/ABW
+                                </button>
+                                <div class="text-right">
+                                    <span id="crclResult" class="calc-result block" data-value=""></span>
+                                    <span id="bwResult" class="calc-result block" data-value=""></span>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- CHA2DS2-VASc Calculator -->
+                    <details>
+                        <summary class="flex justify-between items-center">
+                            <span>2. CHA₂DS₂-VASc 風險計算 (選填)</span>
+                            <span class="text-sm font-normal text-blue-600">點擊展開</span>
+                        </summary>
+                        <div class="calculator-content space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <!-- Age -->
+                                <fieldset>
+                                    <legend class="calc-label">年齡 (Age)</legend>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center">
+                                            <input id="c2vAge<65" name="c2vAge" type="radio" class="h-4 w-4 text-blue-600 border-gray-300" value="0" checked>
+                                            <label for="c2vAge<65" class="ml-2 block text-sm text-gray-900">&lt; 65 歲 (0 分)</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input id="c2vAge65-74" name="c2vAge" type="radio" class="h-4 w-4 text-blue-600 border-gray-300" value="1">
+                                            <label for="c2vAge65-74" class="ml-2 block text-sm text-gray-900">65-74 歲 (+1 分)</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input id="c2vAge>=75" name="c2vAge" type="radio" class="h-4 w-4 text-blue-600 border-gray-300" value="2">
+                                            <label for="c2vAge>=75" class="ml-2 block text-sm text-gray-900">≥ 75 歲 (+2 分)</label>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <!-- Sex -->
+                                <fieldset>
+                                    <legend class="calc-label">性別 (Sex)</legend>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center">
+                                            <input id="c2vSexMale" name="c2vSex" type="radio" class="h-4 w-4 text-blue-600 border-gray-300" value="0" checked>
+                                            <label for="c2vSexMale" class="ml-2 block text-sm text-gray-900">男性 (0 分)</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input id="c2vSexFemale" name="c2vSex" type="radio" class="h-4 w-4 text-blue-600 border-gray-300" value="1">
+                                            <label for="c2vSexFemale" class="ml-2 block text-sm text-gray-900">女性 (+1 分)</label>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <!-- Checkboxes -->
+                            <div class="grid grid-cols-2 gap-x-4 gap-y-3">
+                                <div class="flex items-center">
+                                    <input id="c2vChf" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                                    <label for="c2vChf" class="ml-2 block text-sm text-gray-900">心臟衰竭 (CHF) (+1)</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="c2vHt" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                                    <label for="c2vHt" class="ml-2 block text-sm text-gray-900">高血壓 (Hypertension) (+1)</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="c2vDm" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                                    <label for="c2vDm" class="ml-2 block text-sm text-gray-900">糖尿病 (Diabetes) (+1)</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="c2vStroke" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                                    <label for="c2vStroke" class="ml-2 block text-sm text-gray-900">中風/TIA/TE (+2)</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="c2vVd" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                                    <label for="c2vVd" class="ml-2 block text-sm text-gray-900">血管疾病 (Vascular) (+1)</label>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center mt-4">
+                                <button id="calculateCha2ds2vascButton" class="calc-button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h3m-3-10h3m6 9a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    計算分數
+                                </button>
+                                <span id="cha2ds2vascResult" class="calc-result" data-value=""></span>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+                <!-- v16.0: 計算機結束 -->
+
+
                 <div class="terms-section">
                     <h3>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2 text-yellow-600"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                         使用條款與隱私聲明 (必讀)
                     </h3>
                     <ul>
-                        <li>使用者（藥師）承諾並保證，所有輸入本工具的病患資料，**均已完成「去識別化」**，已移除所有可直接或間接識別特定個人的資訊 (例如：姓名、病歷號、身分證字號、聯絡方式、完整生日等)。</li>
+                        <li>使用者（藥師）承諾並保證，所有輸入本工具的病患資料，<strong>均已完成「去識別化」</strong>，已移除所有可直接或間接識別特定個人的資訊 (例如：姓名、病歷號、身分證字號、聯絡方式、完整生日等)。</li>
                         <li>使用者理解並同意，提交的「去識別化」匿名資料將被傳送給第三方 AI 服務（例如 Google Gemini API）進行分析處理，以產生 SOAP 筆記草稿。</li>
-                        <li>若使用者違反上述承諾，輸入了「可識別」的個人資料，導致任何法律責任、資料外洩、或侵害第三方權益之情事，**所有相關法律責任與損害賠償應由該使用者自行承擔**，與本工具開發者無涉。</li>
-                        <li>**請再次確認您輸入的資料不含任何可識別個人的資訊後，再按下「啟動 AI 分析」按鈕。**</li>
+                        <li>若使用者違反上述承諾，輸入了「可識別」的個人資料，導致任何法律責任、資料外洩、或侵害第三方權益之情事，<strong>所有相關法律責任與損害賠償應由該使用者自行承擔</strong>，與本工具開發者無涉。</li>
+                        <li><strong>請再次確認您輸入的資料不含任何可識別個人的資訊後，再按下「啟動 AI 分析」按鈕。</strong></li>
                     </ul>
-                    </div>
+                </div>
+
+                <div class="flex items-center mb-4">
+                    <input id="termsCheckbox" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="termsCheckbox" class="ml-2 block text-sm text-gray-900">
+                        我已閱讀並同意上述「使用條款與隱私聲明」。
+                    </label>
+                </div>
 
                 <div class="mb-4">
                     <label for="patientInfo" class="block text-sm font-medium text-gray-600 mb-2">
                         病患核心資料 (必填)
                         <span class="text-xs text-gray-500">(例如：主訴、病史、診斷、Lab、用藥...)</span>
                     </label>
-                    <textarea id="patientInfo" rows="10" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="請貼入「去識別化」後的病患資訊..."></textarea>
+                    <textarea id="patientInfo" rows="10" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="請貼入「去識別化」後的病患資訊... (如果未使用上方計算機，AI 會嘗試從這裡抓取 eGFR/Cr/Age 等資訊)"></textarea>
                 </div>
 
                 <div class="mb-4">
@@ -168,7 +359,7 @@
                 </div>
 
                 <div class="mt-auto pt-4">
-                    <button id="generateButton" class="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 ease-in-out hover:scale-105 flex items-center justify-center">
+                    <button id="generateButton" class="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-300 ease-in-out hover:scale-105 flex items-center justify-center opacity-70 cursor-not-allowed" disabled>
                         🚀 啟動 AI 分析
                     </button>
                 </div>
@@ -179,36 +370,40 @@
                     <h2 class="text-2xl font-semibold text-gray-700 flex items-center">
                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 text-blue-500"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><line x1="12" y1="11" x2="12" y2="17"></line><line x1="9" y1="14" x2="15" y2="14"></line></svg>
                          2. 產生的筆記草稿
-                     </h2>
+                    </h2>
                      <button id="copyButton" class="bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-transform duration-200 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
                          一鍵複製
                      </button>
-                 </div>
+                </div>
                 
                  <div id="progressBarContainer">
                      <div class="progress-bar"></div>
                  </div>
 
+                 <!-- v16.0: 更新 placeholder 文字 -->
                  <div id="placeholder" class="text-center text-gray-500 p-8 border-2 border-dashed border-gray-300 rounded-lg transition-opacity duration-300">
                      <p class="font-semibold">AI 將自動執行以下任務：</p>
                      <ul class="list-disc list-inside text-left mt-2 text-sm">
                          <li>分析病歷並識別主要問題。</li>
                          <li>即時上網搜尋最新的國際指引 (GINA, GOLD...)。</li>
                          <li>評估 DDI 與重複用藥。</li>
-                         <li>(v15.2) 整合您提供的資料庫重點並註明來源。</li>
+                         <li>(v16.0) 整合您在左側計算的 CrCl, IBW/ABW, CHA₂DS₂-VASc 結果。</li>
+                         <li>(v15.2) 整合您提供的 UpToDate/Micromedex/OpenEvidence 重點。</li>
                      </ul>
                      <p class="text-sm mt-4">所有內容均需由專業藥師最終審核。</p>
                  </div>
 
                  <div id="output" class="hidden prose max-w-none prose-pre:whitespace-pre-wrap bg-gray-50 p-4 rounded-lg border border-gray-200" style="min-height: 200px;"></div>
 
+                 <!-- v16.0: 更新 infoBox 版本號 -->
                  <div id="infoBox" class="hidden mt-4 bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg">
-                     <h4 class="font-bold text-sm">AI 輔助說明 (v15.4)：</h4>
+                     <h4 class="font-bold text-sm">AI 輔助說明 (v16.0)：</h4>
                      <ul class="list-disc list-inside text-sm mt-1">
-                         <li>**最新指引：** AI 已被指示在「Assessment」中**必須註明**所參考指引的**「實際年份」**與**「原文句子」**。</li>
-                         <li>**DDI 分析：** 藥物交互作用 (DDI) 評估已使用 Gemini 深度研究功能完成。</li>
-                         <li>**資料庫整合：** AI 已整合您提供的 UpToDate/Micromedex/OpenEvidence 資訊。</li>
-                         <li>**專業審核：** 內容僅供參考，請務必由您進行最終的專業審核與修改。</li>
+                         <li><strong>最新指引：</strong> AI 已被指示在「Assessment」中<strong>必須註明</strong>所參考指引的<strong>「實際年份」</strong>與<strong>「原文句子」</strong>。</li>
+                         <li><strong>DDI 分析：</strong> 藥物交互作用 (DDI) 評估已使用 Gemini 深度研究功能完成。</li>
+                         <li><strong>資料庫整合：</strong> AI 已整合您提供的 UpToDate/Micromedex/OpenEvidence 資訊。</li>
+                         <li><strong>公式整合：</strong> AI 已整合您使用本 App 計算的 CrCl, IBW/ABW, CHA₂DS₂-VASc 評估。</li>
+                         <li><strong>專業審核：</strong> 內容僅供參考，請務必由您進行最終的專業審核與修改。</li>
                      </ul>
                  </div>
 
@@ -216,70 +411,70 @@
                      <h3 id="sourcesTitle" class="text-lg font-semibold text-gray-600 mb-2">引用的指引與參考來源：</h3>
                      <ul id="sourcesList" class="list-none list-inside text-sm space-y-1"></ul>
                  </div>
-             </div>
-         </main>
+            </div>
+        </main>
 
         <section class="bg-white p-6 rounded-xl shadow-xl mt-6">
             <details>
-                 <summary class="text-xl">如何取得與使用 API 金鑰？</summary>
-                 <div class="mt-4 prose max-w-none">
-                     <p>
-                         這個工具需要「Google Gemini API 金鑰」才能啟動 AI 大腦並連線到 Google 搜尋。這是一把專屬於您的鑰匙。
-                         <br>
-                         這個金鑰**只會**儲存在您當前的瀏覽器 (<code>localStorage</code>) 中，不會上傳到任何伺服器，因此非常安全。
-                     </p>
-                     
-                     <div class="instruction-step">
-                         <h4>步驟 1：前往 Google AI Studio</h4>
-                         <p>
-                             點擊此連結 <a href="https://aistudio.google.com/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">https://aistudio.google.com/</a>，並使用您的 Google 帳號登入。
-                         </p>
-                     </div>
-                     
-                     <div class="instruction-step">
-                         <h4>步驟 2：建立 API 金鑰</h4>
-                         <p>
-                             登入後，點擊頁面左側的「Get API key」(取得 API 金鑰)。
-                             <br>
-                             在下一個畫面中，點擊「Create API key in new project」(在新專案中建立 API 金鑰)。
-                         </p>
-                     </div>
+                <summary class="text-xl">如何取得與使用 API 金鑰？</summary>
+                <div class="mt-4 prose max-w-none">
+                    <p>
+                        這個工具需要「Google Gemini API 金鑰」才能啟動 AI 大腦並連線到 Google 搜尋。這是一把專屬於您的鑰匙。
+                        <br>
+                        這個金鑰<strong>只會</strong>儲存在您當前的瀏覽器 (<code>localStorage</code>) 中，不會上傳到任何伺服器，因此非常安全。
+                    </p>
+                    
+                    <div class="instruction-step">
+                        <h4>步驟 1：前往 Google AI Studio</h4>
+                        <p>
+                            點擊此連結 <a href="https://aistudio.google.com/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline">https://aistudio.google.com/</a>，並使用您的 Google 帳號登入。
+                        </p>
+                    </div>
+                    
+                    <div class="instruction-step">
+                        <h4>步驟 2：建立 API 金鑰</h4>
+                        <p>
+                            登入後，點擊頁面左側的「Get API key」(取得 API 金鑰)。
+                            <br>
+                            在下一個畫面中，點擊「Create API key in new project」(在新專案中建立 API 金鑰)。
+                        </p>
+                    </div>
 
-                     <div class="instruction-step">
-                         <h4>步驟 3：複製金鑰</h4>
-                         <p>
-                             畫面上會彈出一個視窗，顯示您新產生的金鑰（它是一長串隨機字母和數字，例如 <code>AIzaSy...</code>）。
-                             <br>
-                             請點擊它旁邊的「複製」按鈕。
-                         </p>
-                     </div>
+                    <div class="instruction-step">
+                        <h4>步驟 3：複製金鑰</h4>
+                        <p>
+                            畫面上會彈出一個視窗，顯示您新產生的金鑰（它是一長串隨機字母和數字，例如 <code>AIzaSy...</code>）。
+                            <br>
+                            請點擊它旁邊的「複製」按鈕。
+                        </p>
+                    </div>
 
-                     <div class="instruction-step">
-                         <h4>步驟 4：貼上並儲存</h4>
-                         <p>
-                             回到這個頁面，將您剛剛複製的金鑰，貼到最上方的「Google Gemini API 金鑰」輸入框中。
-                             <br>
-                             點擊「儲存金鑰」。
-                         </p>
-                     </div>
-                     
-                     <div class="instruction-step">
-                         <h4>步驟 5：完成！</h4>
-                         <p>
-                             您現在可以開始使用這個工具了。金鑰已儲存，您下次重新整理或打開這個 HTML 檔案時，都不需要再重新輸入。
-                         </p>
-                     </div>
-                 </div>
+                    <div class="instruction-step">
+                        <h4>步驟 4：貼上並儲存</h4>
+                        <p>
+                            回到這個頁面，將您剛剛複製的金鑰，貼到最上方的「Google Gemini API 金鑰」輸入框中。
+                            <br>
+                            點擊「儲存金鑰」。
+                        </p>
+                    </div>
+                    
+                    <div class="instruction-step">
+                        <h4>步驟 5：完成！</h4>
+                        <p>
+                            您現在可以開始使用這個工具了。金鑰已儲存，您下次重新整理或打開這個 HTML 檔案時，都不需要再重新輸入。
+                        </p>
+                    </div>
+                </div>
              </details>
-         </section>
-     </div>
+        </section>
+    </div>
 
     <div id="errorModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center hidden z-50">
         <div class="relative mx-auto p-5 border w-full max-w-md shadow-lg rounded-xl bg-white">
             <div class="mt-3 text-center">
                 <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-                     <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                 </div>
+                    <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </div>
                  <h3 class="text-lg leading-6 font-medium text-gray-900 mt-2">發生錯誤</h3>
                  <div class="mt-2 px-7 py-3">
                      <p id="errorMessage" class="text-sm text-gray-500">無法產生筆記，請稍後再試。</p>
@@ -288,8 +483,8 @@
                      <button id="closeModalButton" class="px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">關閉</button>
                  </div>
              </div>
-         </div>
-     </div>
+        </div>
+    </div>
 
     <script>
         // === DOM 元素 ===
@@ -299,6 +494,30 @@
         const uptodateInfoInput = document.getElementById('uptodateInfo');
         const micromedexInfoInput = document.getElementById('micromedexInfo');
         const openevidenceInfoInput = document.getElementById('openevidenceInfo');
+        const termsCheckbox = document.getElementById('termsCheckbox');
+
+        // v16.0: CrCl & IBW/ABW 計算機 DOM
+        const calcSex = document.getElementById('calcSex');
+        const calcAge = document.getElementById('calcAge');
+        const calcWeight = document.getElementById('calcWeight');
+        const calcHeight = document.getElementById('calcHeight');
+        const calcScr = document.getElementById('calcScr');
+        const calculateCrClBwButton = document.getElementById('calculateCrClBwButton');
+        const crclResult = document.getElementById('crclResult');
+        const bwResult = document.getElementById('bwResult');
+
+        // v16.0: CHA2DS2-VASc 計算機 DOM
+        const c2vAgeLess65 = document.getElementById('c2vAge<65');
+        const c2vAge65_74 = document.getElementById('c2vAge65-74');
+        const c2vAgeGreater75 = document.getElementById('c2vAge>=75');
+        const c2vSexFemale = document.getElementById('c2vSexFemale');
+        const c2vChf = document.getElementById('c2vChf');
+        const c2vHt = document.getElementById('c2vHt');
+        const c2vDm = document.getElementById('c2vDm');
+        const c2vStroke = document.getElementById('c2vStroke');
+        const c2vVd = document.getElementById('c2vVd');
+        const calculateCha2ds2vascButton = document.getElementById('calculateCha2ds2vascButton');
+        const cha2ds2vascResult = document.getElementById('cha2ds2vascResult');
         
         const outputDiv = document.getElementById('output');
         const placeholderDiv = document.getElementById('placeholder');
@@ -326,7 +545,6 @@
 
         // === 全域變數 ===
         let apiKey = "";
-        
         const modelName = "gemini-2.5-flash-preview-09-2025";
         const apiUrlBase = "https://generativelanguage.googleapis.com/v1beta/models/";
 
@@ -372,7 +590,6 @@
 
         // === 錯誤處理 ===
         function showError(message) {
-             // v15.4 Legal: 修改未設定 API Key 時的錯誤訊息
             if (apiKey === "") {
                 errorMessage.textContent = "API 金鑰尚未設定或無效。請在最上方的「連線設定」區塊輸入並儲存您的金鑰，或檢查金鑰是否正確。";
             } else {
@@ -383,6 +600,96 @@
         closeModalButton.addEventListener('click', () => {
             errorModal.classList.add('hidden');
         });
+
+        // === v16.0: 計算機邏輯 ===
+        function calculateCrClAndBw() {
+            const age = parseFloat(calcAge.value);
+            const weight = parseFloat(calcWeight.value);
+            const height = parseFloat(calcHeight.value);
+            const scr = parseFloat(calcScr.value);
+            const sex = calcSex.value;
+
+            let crclCalculated = false;
+            let bwCalculated = false;
+
+            // 1. Calculate CrCl (Cockcroft-Gault)
+            if (!isNaN(age) && !isNaN(weight) && !isNaN(scr) && scr > 0) {
+                let crcl = ((140 - age) * weight) / (72 * scr);
+                if (sex === 'Female') {
+                    crcl *= 0.85;
+                }
+                const crclVal = `${crcl.toFixed(1)} mL/min`;
+                crclResult.textContent = `CrCl: ${crclVal}`;
+                crclResult.dataset.value = crclVal; // Store for prompt
+                crclCalculated = true;
+            } else {
+                crclResult.textContent = "";
+                crclResult.dataset.value = "";
+            }
+
+            // 2. Calculate IBW/ABW
+            if (!isNaN(height) && !isNaN(weight)) {
+                let ibw = 0;
+                if (height > 152) { // 假設公式適用於 152cm (60 inches) 以上
+                    if (sex === 'Male') {
+                        ibw = 50 + (0.9 * (height - 152)); // (2.3 * (height_in_inches - 60)) * 2.54 / 0.9 = 0.9
+                    } else { // Female
+                        ibw = 45.5 + (0.9 * (height - 152));
+                    }
+                } else {
+                    // 簡易處理 152cm 以下 (非標準 C-G，但為 IBW 提供一個基準)
+                    if (sex === 'Male') { ibw = 50; } else { ibw = 45.5; }
+                }
+
+                const upperLimit = ibw * 1.2; // 20% 閾值
+                let assessment = "";
+                if (weight > upperLimit) {
+                    assessment = "位於ABW範圍內 (TBW/IBW > 1.2)";
+                } else {
+                    assessment = "未進入ABW範圍 (TBW/IBW ≤ 1.2)";
+                }
+                
+                const bwVal = `IBW: ${ibw.toFixed(1)} kg. 評估: ${assessment}`;
+                bwResult.textContent = bwVal;
+                bwResult.dataset.value = bwVal; // Store for prompt
+                bwCalculated = true;
+            } else {
+                bwResult.textContent = "";
+                bwResult.dataset.value = "";
+            }
+
+            if (!crclCalculated && !bwCalculated) {
+                crclResult.textContent = "請輸入必填欄位";
+            }
+        }
+
+        function calculateCha2ds2vasc() {
+            let score = 0;
+
+            // Age
+            if (c2vAgeGreater75.checked) {
+                score += 2;
+            } else if (c2vAge65_74.checked) {
+                score += 1;
+            }
+
+            // Sex
+            if (c2vSexFemale.checked) {
+                score += 1;
+            }
+
+            // Comorbidities
+            if (c2vChf.checked) score += 1;
+            if (c2vHt.checked) score += 1;
+            if (c2vDm.checked) score += 1;
+            if (c2vStroke.checked) score += 2;
+            if (c2vVd.checked) score += 1;
+
+            const scoreVal = `${score} 分`;
+            cha2ds2vascResult.textContent = `Score: ${scoreVal}`;
+            cha2ds2vascResult.dataset.value = scoreVal; // Store for prompt
+        }
+
 
         // === 核心 API 呼叫 ===
         async function callGeminiAPI(systemPrompt, userPrompt, useSearch = true) {
@@ -451,7 +758,7 @@
                         } else if (result.promptFeedback?.blockReason) {
                             errorMsg = `請求被阻擋：${result.promptFeedback.blockReason}`;
                         } else if (!candidate) {
-                             errorMsg = "API 未返回有效的候選答案 (可能已過載)。";
+                            errorMsg = "API 未返回有效的候選答案 (可能已過載)。";
                         }
                         throw new Error(errorMsg);
                     }
@@ -468,8 +775,27 @@
         }
 
         // === 事件監聽器 ===
-        document.addEventListener('DOMContentLoaded', loadApiKey);
+        document.addEventListener('DOMContentLoaded', () => {
+            loadApiKey();
+            generateButton.disabled = true;
+            generateButton.classList.add('opacity-70', 'cursor-not-allowed');
+        });
+
         saveApiKeyButton.addEventListener('click', saveApiKey);
+
+        termsCheckbox.addEventListener('change', () => {
+            generateButton.disabled = !termsCheckbox.checked;
+            if (termsCheckbox.checked) {
+                generateButton.classList.remove('opacity-70', 'cursor-not-allowed');
+            } else {
+                generateButton.classList.add('opacity-70', 'cursor-not-allowed');
+            }
+        });
+
+        // v16.0: 計算機按鈕監聽
+        calculateCrClBwButton.addEventListener('click', calculateCrClAndBw);
+        calculateCha2ds2vascButton.addEventListener('click', calculateCha2ds2vasc);
+
 
         queryGuidelinesButton.addEventListener('click', async () => {
             if (apiKey === "") {
@@ -517,6 +843,11 @@
         });
 
         generateButton.addEventListener('click', async () => {
+            if (!termsCheckbox.checked) {
+                showError("請先閱讀並勾選同意「使用條款與隱私聲明」。");
+                return;
+            }
+
             if (apiKey === "") {
                 showError("請先設定 API 金鑰。");
                 return;
@@ -527,6 +858,11 @@
             const uptodateInfo = uptodateInfoInput.value.trim();
             const micromedexInfo = micromedexInfoInput.value.trim();
             const openevidenceInfo = openevidenceInfoInput.value.trim();
+            
+            // v16.0: 獲取 "計算後" 的值
+            const cha2ds2Score = cha2ds2vascResult.dataset.value || "";
+            const crcl = crclResult.dataset.value || "";
+            const bwAssessment = bwResult.dataset.value || "";
 
             if (!patientInfo.trim()) {
                 showError("請輸入「病患核心資料」。");
@@ -547,17 +883,18 @@
             sourcesTitle.textContent = '引用的指引與參考來源：';
             copyButton.disabled = true;
 
+            // v16.0: 更新 System Prompt
             const systemPrompt = `您是一位頂尖的臨床藥師，擁有豐富的經驗，並且隨時掌握最新的國際醫療指引。
 
-您的任務是 (v15.4)：
+您的任務是 (v16.0)：
 1.  仔細分析使用者在 [病患核心資料] 中提供的資訊 (病史、Lab、用藥等)。
 2.  自動識別出最相關的主要病症。
 3.  (最重要) **使用 Google 搜尋來查找並確認**該病症**「實際的最新指引版本和年份」**。
     * 例如：搜尋 "latest GINA guideline update", "current GOLD report version", "AHA hypertension guideline latest year"。
     * 您必須理解，指引**並非每年更新**。您的目標是找到那個「實際的」年份。
 
-    // --- 🚨 新增的第 3.1 點 ---
-    3.1 (強制優先級) 在搜尋指引時，您**必須**優先查找並引用以下全球公認的權威來源：
+    // --- 🚨 第 3.1 點 (強制優先級) ---
+    3.1 在搜尋指引時，您**必須**優先查找並引用以下全球公認的權威來源：
         * **心血管:** ACC/AHA, ESC
         * **腫瘤:** NCCN, ASCO, ESMO
         * **糖尿病/內分泌:** ADA, AACE
@@ -566,22 +903,30 @@
         * **腎臟:** KDIGO
         * **風濕免疫:** ACR, EULAR
         如果**確實無法**在這些來源中找到直接相關的最新指引，才能參考其他信譽良好的來源，但**必須在 (A) 中明確說明**您為何選擇了替代來源。
-    // --- 🚨 新增結束 ---
+    // --- 🚨 結束 ---
 
 4.  (重要) **請分析**病患目前用藥清單中的**潛在藥物交互作用 (DDI)** 或**重複用藥 (Duplicate Therapy)**。您可以使用 Google 搜尋來輔助驗證。
 5.  (v14.1) 如果使用者提供了 [專科焦點] (例如 "心臟內科")，您的評估應更側重於該領域，並**優先參考該領域的權威指引** (如 ACC/AHA)。
-6.  (v15.2) 使用者可能會在 [UpToDate 資料], [Micromedex 資料], [OpenEvidence 資料] 欄位提供補充資訊。
-7.  (v15.2) 如果這些欄位「有內容」，您**必須**將這些重點整合到您的 (A) 或 (P) 中，並且**「明確註明來源」**(例如："根據 Micromedex 資料..." 或 "UpToDate 亦指出...")。如果欄位為空，則忽略。
-8.  根據「SOAP」格式，撰寫一份專業、精確、格式化的藥師筆記草稿 (保留粗體和換行)。
-9.  在您的「Assessment (A)」部分：
+
+6.  (v16.0) 使用者已在 App 中使用計算機，並在 [APP計算結果] 欄位提供了「已算出的值」。您**必須**將這些「計算結果」整合到您的 (O) 客觀資料或 (A) 評估中。
+    * **備援邏輯：** 如果 [APP計算結果] 欄位為空 (代表使用者未計算)，您才需要像以前一樣，自行從 [病患核心資料] 中抓取 eGFR, Lab, Age 等資訊來進行評估。
+
+7.  (v15.2) 使用者可能會在 [UpToDate 資料], [Micromedex 資料], [OpenEvidence 資料] 欄位提供補充資訊。
+8.  (v15.2) 如果第 7 點的欄位「有內容」，您**必須**將這些重點整合到您的 (A) 或 (P) 中，並且**「明確註明來源」**(例如："根據 Micromedex 資料..." 或 "UpToDate 亦指出...")。如果欄位為空，則忽略。
+9.  根據「SOAP」格式，撰寫一份專業、精確、格式化的藥師筆記草稿 (保留粗體和換行)。
+10. 在您的「Assessment (A)」部分：
     * **(v14.1 強制)** **必須明確提及**您參考的指引名稱與**「實際年份」** (例如："根據 GINA 2024 指引...")，**且該指引應優先來自第 3.1 點的清單**。
     * **(v14.1 強制)** **必須引用**該指引中的**「精確原文句子」**來支持您的臨床決策 (例如："...GINA 2024 建議... (原文: '...')")。
     * **必須包含**您對 DDI 或重複用藥的評估。
-    * **必須包含**對腎功能 (eGFR) 的考量與劑量評估。
-10. 在您的「Plan (P)」部分：
+    * **必須包含**對腎功能 (eGFR 或 您收到的 CrCl 計算值) 的考量與劑量評估。
+11. 在您的「Plan (P)」部分：
     * 您的所有建議都必須**符合**您在 (A) 中提到的最新指引。
 
-11. (*** v14 格式要求 ***)
+12. (*** v16.0 體重評估邏輯 ***)
+    * 如果您在 [APP計算結果] 中收到 "位於ABW範圍內" 或類似的描述，這代表病患的「實際體重」已超過「理想體重」一定比例。
+    * 在這種情況下，您在 (A) 或 (P) 中評估藥物劑量時 (特別是水溶性藥物)，必須意識到**不應**直接使用實際體重 (TBW) 或理想體重 (IBW)，而應**建議**使用「調整體重 (Adjusted Body Weight, ABW)」來計算，並在筆記中提及這一點 (例如： "病患體重位於ABW範圍，建議使用 ABW (Adjusted Body Weight) 進行劑量計算..."）。
+
+13. (*** v16.0 格式要求 ***)
     * 您的回覆**必須**嚴格遵守此格式：
     [完整的 SOAP 筆記 (S, O, A, P)]
     ---GUIDELINES_USED---
@@ -591,20 +936,36 @@
     * (v15.2) [若有使用 UpToDate, 請註明]
     * (v15.2) [若有使用 Micromedex, 請註明]
     * (v15.2) [若有使用 OpenEvidence, 請註明]
+    * (v16.0) [若有使用 APP計算結果 (CrCl/BW/CHA2DS2-VASc), 請註明]
 
-12. (*** v14.4 格式禁止 ***)
+14. (*** v14.4 格式禁止 ***)
     * **禁止**在您的回覆中使用任何 LaTeX 語法 (例如 $...$ 或 $$...$$ 或 \\text{})。
     * 必須直接使用 Unicode 字元 (例如：β, α, °, ≈, mmHg)。`;
 
+            // v16.0: 更新 User Prompt
             let userPrompt = `--- 病患核心資料 (必填) START ---
 ${patientInfo}
 --- 病患核心資料 END ---
 `;
             if (specialtyFocus) { userPrompt += `\n--- 專科焦點 (選填) ---\n${specialtyFocus}\n`; }
+            
+            // v16.0: 組合計算結果
+            let calcResults = "";
+            if (crcl) { calcResults += `Creatine Clearance (Cockcroft-Gault): ${crcl}\n`; }
+            if (bwAssessment) { calcResults += `體重評估 (IBW/ABW): ${bwAssessment}\n`; }
+            if (cha2ds2Score) { calcResults += `CHA2DS2-VASc Score: ${cha2ds2Score}\n`; }
+            
+            if (calcResults) {
+                userPrompt += `\n--- APP計算結果 (選填) START ---\n${calcResults.trim()}\n--- APP計算結果 END ---\n`;
+            }
+
             if (uptodateInfo) { userPrompt += `\n--- UpToDate 資料 (選填) START ---\n${uptodateInfo}\n--- UpToDate 資料 END ---\n`; }
             if (micromedexInfo) { userPrompt += `\n--- Micromedex 資料 (選填) START ---\n${micromedexInfo}\n--- Micromedex 資料 END ---\n`; }
             if (openevidenceInfo) { userPrompt += `\n--- OpenEvidence 資料 (選填) START ---\n${openevidenceInfo}\n--- OpenEvidence 資料 END ---\n`; }
             userPrompt += `\n請根據上述所有資訊，使用最新的國際指引產生一份藥師 SOAP 筆記。`;
+
+            // console.log("System Prompt:", systemPrompt);
+            // console.log("User Prompt:", userPrompt);
 
             try {
                 const { text, sources } = await callGeminiAPI(systemPrompt, userPrompt, true); 
@@ -620,7 +981,6 @@ ${patientInfo}
                     guidelinesText = parts[1].trim();
                 }
                 
-                // (v15.4 HTML 處理邏輯 - 保持不變)
                 soapNote = soapNote.replace(/\$\$(.*?)\$\$/g, '$1');
                 soapNote = soapNote.replace(/\$(.*?)\$/g, '$1');
                 soapNote = soapNote.replace(/\\text\{(.*?)\}/g, '$1');
@@ -692,18 +1052,47 @@ ${patientInfo}
             } finally {
                 progressBarContainer.style.display = 'none';
                 placeholderDiv.classList.remove('animate-pulse');
-                generateButton.disabled = false;
-                generateButton.classList.remove('opacity-70', 'cursor-not-allowed');
+                generateButton.disabled = !termsCheckbox.checked; 
+                if (termsCheckbox.checked) {
+                    generateButton.classList.remove('opacity-70', 'cursor-not-allowed');
+                }
                 clearInputsButton.disabled = false;
             }
         });
 
+        // v16.0: 更新清除按鈕邏輯
         clearInputsButton.addEventListener('click', () => {
             patientInfoInput.value = '';
             specialtyFocusSelect.value = '';
             uptodateInfoInput.value = '';
             micromedexInfoInput.value = '';
             openevidenceInfoInput.value = '';
+            
+            // Clear CrCl & IBW/ABW
+            calcSex.value = 'Male';
+            calcAge.value = '';
+            calcWeight.value = '';
+            calcHeight.value = '';
+            calcScr.value = '';
+            crclResult.textContent = '';
+            crclResult.dataset.value = '';
+            bwResult.textContent = '';
+            bwResult.dataset.value = '';
+
+            // Clear CHA2DS2-VASc
+            c2vAgeLess65.checked = true;
+            document.getElementById('c2vSexMale').checked = true;
+            c2vChf.checked = false;
+            c2vHt.checked = false;
+            c2vDm.checked = false;
+            c2vStroke.checked = false;
+            c2vVd.checked = false;
+            cha2ds2vascResult.textContent = '';
+            cha2ds2vascResult.dataset.value = '';
+
+            termsCheckbox.checked = false;
+            generateButton.disabled = true;
+            generateButton.classList.add('opacity-70', 'cursor-not-allowed');
             
             outputDiv.classList.add('hidden');
             placeholderDiv.classList.remove('hidden');
@@ -714,7 +1103,6 @@ ${patientInfo}
         });
 
         copyButton.addEventListener('click', () => {
-            // v16.1 修正: 從 <pre> 複製
             const preElement = outputDiv.querySelector('pre');
             const textToCopy = preElement ? (preElement.textContent || preElement.innerText) : '';
 
@@ -759,4 +1147,3 @@ ${patientInfo}
 
 </body>
 </html>
-
