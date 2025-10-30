@@ -1,4 +1,4 @@
-# 🧠 智慧藥師 SOAP 筆記產生器 (v16.0)
+# 🧠 智慧藥師 SOAP 筆記產生器 (v16.1)
 AI 依據最新臨床指引與即時計算，自動生成 SOAP 草稿
 
 ---
@@ -10,17 +10,21 @@ AI 依據最新臨床指引與即時計算，自動生成 SOAP 草稿
 | 📚 智慧指引查核 | Gemini 會自動分析病歷並使用 Google 搜尋查詢最新臨床指引年份（如 GINA、GOLD、AHA 等） |
 | 🧾 強制精準引用 | 必須在 Assessment 明確標示**指引名稱＋實際年份**，並引用指引原文句子支持建議 |
 | 💊 DDI 與重複用藥分析 | 自動解析用藥清單，找出交互作用與重複用藥並提供建議 |
-| 🧮 計算結果整合 | **(v16.0 新增)** AI 會自動將您在計算機算出的 CrCl、CHA₂DS₂-VASc 等結果整合進 (O) 與 (A) |
+| 🧮 計算結果整合 | **(v16.1 升級)** AI 會自動將您在計算機算出的 **CrCl, eGFR, BSA, Child-Pugh, CHA₂DS₂-VASc** 等結果整合進 (O) 與 (A) |
+| 🩺 肝腎功能評估 | **(v16.1 新增)** AI 指令已更新，**強制要求** AI 必須根據您計算出的 CrCl/eGFR 及 Child-Pugh 分數，主動評估藥物劑量調整（依據指引或仿單） |
 
 ---
 
-## 🧮 整合式臨床計算機 (v16.0)
+## 🧮 整合式臨床計算機 (v16.1)
 仿造臨床 App 介面，直接輸入參數即可即時計算，並自動帶入 AI 評估。
 
 | 計算機 | 功能 |
 |---|---|
-| 🧪 **CrCl & IBW/ABW** | 輸入 Age, Sex, Weight, Height, SCr 即可計算 Cockcroft-Gault CrCl 與體重評估 (IBW/ABW) |
-| ❤️ **CHA₂DS₂-VASc Score** | 點選病史（如 CHF, HT, DM...）即可計算中風風險分數 |
+| 🧪 **CrCl (C-G) & IBW/ABW** | 輸入 Age, Sex, Weight, Height, SCr 計算 C-G CrCl 與體重評估 (IBW/ABW) |
+| 🌊 **eGFR (CKD-EPI)** | **(v16.1 新增)** 自動帶入 C-G 欄位，計算 2021 CKD-EPI eGFR |
+| 🧍 **BSA (Mosteller)** | **(v16.1 新增)** 自動帶入 C-G 欄位，計算體表面積 (m²) |
+| 🫁 **Child-Pugh Score** | **(v16.1 新增)** 點選 Bilirubin, Albumin, INR, 腹水, 肝腦病變，評估肝功能等級 (A, B, C) |
+| ❤️ **CHA₂DS₂-VASc Score** | 點選病史（如 CHF, HT, DM...）計算中風風險分數 |
 | 🔄 **智慧型備援** | **(選填)** 如果不使用計算機，AI 會自動從「病患核心資料」中抓取 Lab 資訊進行評估 |
 
 ---
@@ -63,7 +67,7 @@ AI 依據最新臨床指引與即時計算，自動生成 SOAP 草稿
 ### 2️⃣ 產生 SOAP 筆記
 
 1️⃣ 貼上 API 金鑰 → 儲存
-2️⃣ **(選填)** 展開計算機，輸入參數並計算 CrCl / CHA₂DS₂-VASc
+2️⃣ **(選填)** 展開計算機，輸入參數並計算 **CrCl / eGFR / BSA / Child-Pugh / CHA₂DS₂-VASc**
 3️⃣ 輸入病患核心資料與用藥
 4️⃣ **(必填)** 勾選同意「使用條款與隱私聲明」
 5️⃣ 按下「啟動 AI 分析」 ✅
