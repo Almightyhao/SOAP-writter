@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- v16.0: 更新標題 -->
-    <title>智能藥師 SOAP小幫手 (v16.0 - 整合計算機)</title>
+    <title>智能藥師 SOAP小幫手 (v16.1 - 整合計算機)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
@@ -101,21 +100,43 @@
             border-color: #3b82f6;
             box-shadow: 0 0 0 2px #bfdbfe;
         }
+        /* v16.1: Child-Pugh Radio 樣式 */
+        .calc-radio-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+        .calc-radio-label {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .calc-radio-label input {
+            margin-right: 0.5rem;
+            color: #3b82f6;
+        }
+        .calc-radio-label:has(input:checked) {
+            background-color: #eff6ff; /* bg-blue-50 */
+            border-color: #3b82f6; /* border-blue-500 */
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 to-gray-100 min-h-screen text-gray-800">
 
     <div class="container mx-auto max-w-6xl p-4 py-8">
         <header class="text-center mb-8">
-            <!-- v16.0: 更新 H1 -->
-            <h1 class="text-3xl md:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">智能藥師 SOAP小幫手 (v16.0)</h1>
+            <h1 class="text-3xl md:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">智能藥師 SOAP小幫手 (v16.1)</h1>
             <p class="mt-2 text-lg text-gray-600">AI 驅動的指引查核、DDI 分析與筆記草稿</p>
         </header>
 
         <section class="bg-white p-6 rounded-xl shadow-xl mb-6 border-l-4 border-blue-500">
              <h2 class="text-2xl font-semibold mb-4 text-gray-700 flex items-center">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 text-blue-500"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                 連線設定 (僅需設定一次)
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 text-blue-500"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                連線設定 (僅需設定一次)
              </h2>
              <div class="flex flex-col md:flex-row md:items-center gap-4">
                  <div class="flex-grow">
@@ -131,11 +152,11 @@
 
         <section class="bg-white p-6 rounded-xl shadow-xl mb-6">
              <h2 class="text-2xl font-semibold mb-4 text-gray-700 flex items-center">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 text-blue-500"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5V19A9 3 0 0 0 21 19V5"></path><path d="M3 12A9 3 0 0 0 21 12"></path></svg>
-                 AI 知識庫即時狀態
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 text-blue-500"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5V19A9 3 0 0 0 21 19V5"></path><path d="M3 12A9 3 0 0 0 21 12"></path></svg>
+                AI 知識庫即時狀態
              </h2>
              <p class="text-sm text-gray-600 mb-4">
-                 AI 會在「每次」產生筆記時即時搜尋。您也可以點擊下方按鈕，主動查詢常見指引的最新版本。
+                AI 會在「每次」產生筆記時即時搜尋。您也可以點擊下方按鈕，主動查詢常見指引的最新版本。
              </p>
              <button id="queryGuidelinesButton" class="bg-green-600 text-white font-bold py-2 px-5 rounded-lg shadow-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-transform duration-200 hover:scale-105 flex items-center justify-center">
                  <div id="guidelineSpinner" class="spinner border-4 border-white rounded-full mr-3 hidden"></div>
@@ -183,12 +204,11 @@
                     </select>
                 </div>
 
-                <!-- v16.0: 新增整合計算機 -->
                 <div class="space-y-4 mb-4">
-                    <!-- CrCl & IBW/ABW Calculator -->
+                    
                     <details>
                         <summary class="flex justify-between items-center">
-                            <span>1. CrCl & IBW/ABW 計算 (選填)</span>
+                            <span>1. CrCl (C-G) & IBW/ABW 計算 (選填)</span>
                             <span class="text-sm font-normal text-blue-600">點擊展開</span>
                         </summary>
                         <div class="calculator-content space-y-4">
@@ -220,7 +240,7 @@
                             <div class="flex justify-between items-center mt-4">
                                 <button id="calculateCrClBwButton" class="calc-button">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h3m-3-10h3m6 9a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h3m-3-10h3m6 9a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                     計算 CrCl & IBW/ABW
                                 </button>
@@ -232,7 +252,6 @@
                         </div>
                     </details>
 
-                    <!-- CHA2DS2-VASc Calculator -->
                     <details>
                         <summary class="flex justify-between items-center">
                             <span>2. CHA₂DS₂-VASc 風險計算 (選填)</span>
@@ -240,7 +259,6 @@
                         </summary>
                         <div class="calculator-content space-y-4">
                             <div class="grid grid-cols-2 gap-4">
-                                <!-- Age -->
                                 <fieldset>
                                     <legend class="calc-label">年齡 (Age)</legend>
                                     <div class="space-y-2">
@@ -258,7 +276,6 @@
                                         </div>
                                     </div>
                                 </fieldset>
-                                <!-- Sex -->
                                 <fieldset>
                                     <legend class="calc-label">性別 (Sex)</legend>
                                     <div class="space-y-2">
@@ -273,7 +290,6 @@
                                     </div>
                                 </fieldset>
                             </div>
-                            <!-- Checkboxes -->
                             <div class="grid grid-cols-2 gap-x-4 gap-y-3">
                                 <div class="flex items-center">
                                     <input id="c2vChf" type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
@@ -299,7 +315,7 @@
                             <div class="flex justify-between items-center mt-4">
                                 <button id="calculateCha2ds2vascButton" class="calc-button">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h3m-3-10h3m6 9a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h3m-3-10h3m6 9a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                     計算分數
                                 </button>
@@ -307,10 +323,104 @@
                             </div>
                         </div>
                     </details>
+                    
+                    <details>
+                        <summary class="flex justify-between items-center">
+                            <span>3. BSA (Mosteller) 計算 (選填)</span>
+                            <span class="text-sm font-normal text-blue-600">點擊展開</span>
+                        </summary>
+                        <div class="calculator-content space-y-4">
+                            <p class="text-sm text-gray-500">將自動帶入您在 (1) 中輸入的身高與體重。</p>
+                            <div class="flex justify-between items-center mt-4">
+                                <button id="calculateBsaButton" class="calc-button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h3m-3-10h3m6 9a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    計算 BSA
+                                </button>
+                                <span id="calcBsaResult" class="calc-result" data-value=""></span>
+                            </div>
+                        </div>
+                    </details>
+                    
+                    <details>
+                        <summary class="flex justify-between items-center">
+                            <span>4. eGFR (CKD-EPI 2021) 計算 (選填)</span>
+                            <span class="text-sm font-normal text-blue-600">點擊展開</span>
+                        </summary>
+                        <div class="calculator-content space-y-4">
+                            <p class="text-sm text-gray-500">將自動帶入您在 (1) 中輸入的性別、年齡、SCr。</p>
+                            <div class="flex justify-between items-center mt-4">
+                                <button id="calculateCkdEpiButton" class="calc-button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h3m-3-10h3m6 9a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    計算 eGFR (CKD-EPI)
+                                </button>
+                                <span id="calcCkdEpiResult" class="calc-result" data-value=""></span>
+                            </div>
+                        </div>
+                    </details>
+                    
+                    <details>
+                        <summary class="flex justify-between items-center">
+                            <span>5. Child-Pugh Score (肝功能) 計算 (選填)</span>
+                            <span class="text-sm font-normal text-blue-600">點擊展開</span>
+                        </summary>
+                        <div class="calculator-content space-y-4">
+                            <fieldset>
+                                <legend class="calc-label">腹水 (Ascites)</legend>
+                                <div class="calc-radio-group">
+                                    <label class="calc-radio-label"><input type="radio" name="cpAscites" value="1" checked> 無 (1 分)</label>
+                                    <label class="calc-radio-label"><input type="radio" name="cpAscites" value="2"> 輕微 (2 分)</label>
+                                    <label class="calc-radio-label"><input type="radio" name="cpAscites" value="3"> 中/重度 (3 分)</label>
+                                </div>
+                            </fieldset>
+                            <fieldset>
+                                <legend class="calc-label">肝腦病變 (Encephalopathy)</legend>
+                                <div class="calc-radio-group">
+                                    <label class="calc-radio-label"><input type="radio" name="cpEnceph" value="1" checked> 無 (1 分)</label>
+                                    <label class="calc-radio-label"><input type="radio" name="cpEnceph" value="2"> 第 1-2 級 (2 分)</label>
+                                    <label class="calc-radio-label"><input type="radio" name="cpEnceph" value="3"> 第 3-4 級 (3 分)</label>
+                                </div>
+                            </fieldset>
+                            <fieldset>
+                                <legend class="calc-label">黃疸指數 (Bilirubin, mg/dL)</legend>
+                                <div class="calc-radio-group">
+                                    <label class="calc-radio-label"><input type="radio" name="cpBili" value="1" checked> &lt; 2 (1 分)</label>
+                                    <label class="calc-radio-label"><input type="radio" name="cpBili" value="2"> 2 - 3 (2 分)</label>
+                                    <label class="calc-radio-label"><input type="radio" name="cpBili" value="3"> &gt; 3 (3 分)</label>
+                                </div>
+                            </fieldset>
+                            <fieldset>
+                                <legend class="calc-label">白蛋白 (Albumin, g/dL)</legend>
+                                <div class="calc-radio-group">
+                                    <label class="calc-radio-label"><input type="radio" name="cpAlb" value="1" checked> &gt; 3.5 (1 分)</label>
+                                    <label class="calc-radio-label"><input type="radio" name="cpAlb" value="2"> 2.8 - 3.5 (2 分)</label>
+                                    <label class="calc-radio-label"><input type="radio" name="cpAlb" value="3"> &lt; 2.8 (3 分)</label>
+                                </div>
+                            </fieldset>
+                            <fieldset>
+                                <legend class="calc-label">凝血時間 (INR)</legend>
+                                <div class="calc-radio-group">
+                                    <label class="calc-radio-label"><input type="radio" name="cpInr" value="1" checked> &lt; 1.7 (1 分)</label>
+                                    <label class="calc-radio-label"><input type="radio" name="cpInr" value="2"> 1.7 - 2.3 (2 分)</label>
+                                    <label class="calc-radio-label"><input type="radio" name="cpInr" value="3"> &gt; 2.3 (3 分)</label>
+                                </div>
+                            </fieldset>
+                            <div class="flex justify-between items-center mt-4">
+                                <button id="calculateChildPughButton" class="calc-button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h3m-3-10h3m6 9a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    計算 Child-Pugh Score
+                                </button>
+                                <span id="calcChildPughResult" class="calc-result" data-value=""></span>
+                            </div>
+                        </div>
+                    </details>
+
                 </div>
-                <!-- v16.0: 計算機結束 -->
-
-
                 <div class="terms-section">
                     <h3>
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2 text-yellow-600"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
@@ -380,14 +490,13 @@
                      <div class="progress-bar"></div>
                  </div>
 
-                 <!-- v16.0: 更新 placeholder 文字 -->
                  <div id="placeholder" class="text-center text-gray-500 p-8 border-2 border-dashed border-gray-300 rounded-lg transition-opacity duration-300">
                      <p class="font-semibold">AI 將自動執行以下任務：</p>
                      <ul class="list-disc list-inside text-left mt-2 text-sm">
                          <li>分析病歷並識別主要問題。</li>
                          <li>即時上網搜尋最新的國際指引 (GINA, GOLD...)。</li>
                          <li>評估 DDI 與重複用藥。</li>
-                         <li>(v16.0) 整合您在左側計算的 CrCl, IBW/ABW, CHA₂DS₂-VASc 結果。</li>
+                         <li>(v16.1) 整合您在左側計算的 CrCl, IBW/ABW, CHA₂DS₂-VASc, BSA, CKD-EPI, Child-Pugh 結果。</li>
                          <li>(v15.2) 整合您提供的 UpToDate/Micromedex/OpenEvidence 重點。</li>
                      </ul>
                      <p class="text-sm mt-4">所有內容均需由專業藥師最終審核。</p>
@@ -395,14 +504,13 @@
 
                  <div id="output" class="hidden prose max-w-none prose-pre:whitespace-pre-wrap bg-gray-50 p-4 rounded-lg border border-gray-200" style="min-height: 200px;"></div>
 
-                 <!-- v16.0: 更新 infoBox 版本號 -->
                  <div id="infoBox" class="hidden mt-4 bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg">
-                     <h4 class="font-bold text-sm">AI 輔助說明 (v16.0)：</h4>
+                     <h4 class="font-bold text-sm">AI 輔助說明 (v16.1)：</h4>
                      <ul class="list-disc list-inside text-sm mt-1">
                          <li><strong>最新指引：</strong> AI 已被指示在「Assessment」中<strong>必須註明</strong>所參考指引的<strong>「實際年份」</strong>與<strong>「原文句子」</strong>。</li>
                          <li><strong>DDI 分析：</strong> 藥物交互作用 (DDI) 評估已使用 Gemini 深度研究功能完成。</li>
                          <li><strong>資料庫整合：</strong> AI 已整合您提供的 UpToDate/Micromedex/OpenEvidence 資訊。</li>
-                         <li><strong>公式整合：</strong> AI 已整合您使用本 App 計算的 CrCl, IBW/ABW, CHA₂DS₂-VASc 評估。</li>
+                         <li><strong>公式整合：</strong> AI 已整合您使用本 App 計算的 CrCl, IBW/ABW, CHA₂DS₂-VASc, BSA, CKD-EPI, Child-Pugh 評估。</li>
                          <li><strong>專業審核：</strong> 內容僅供參考，請務必由您進行最終的專業審核與修改。</li>
                      </ul>
                  </div>
@@ -482,7 +590,7 @@
                  <div class="items-center px-4 py-3">
                      <button id="closeModalButton" class="px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300">關閉</button>
                  </div>
-             </div>
+            </div>
         </div>
     </div>
 
@@ -519,6 +627,18 @@
         const calculateCha2ds2vascButton = document.getElementById('calculateCha2ds2vascButton');
         const cha2ds2vascResult = document.getElementById('cha2ds2vascResult');
         
+        // v16.1: BSA 計算機 DOM
+        const calculateBsaButton = document.getElementById('calculateBsaButton');
+        const calcBsaResult = document.getElementById('calcBsaResult');
+
+        // v16.1: CKD-EPI 計算機 DOM
+        const calculateCkdEpiButton = document.getElementById('calculateCkdEpiButton');
+        const calcCkdEpiResult = document.getElementById('calcCkdEpiResult');
+        
+        // v16.1: Child-Pugh 計算機 DOM
+        const calculateChildPughButton = document.getElementById('calculateChildPughButton');
+        const calcChildPughResult = document.getElementById('calcChildPughResult');
+        
         const outputDiv = document.getElementById('output');
         const placeholderDiv = document.getElementById('placeholder');
         const infoBox = document.getElementById('infoBox');
@@ -545,7 +665,7 @@
 
         // === 全域變數 ===
         let apiKey = "";
-        const modelName = "gemini-2.5-flash-preview-09-2025";
+        const modelName = "gemini-1.5-flash-latest"; // 更新為最新 Flash 模型
         const apiUrlBase = "https://generativelanguage.googleapis.com/v1beta/models/";
 
         // === API 金鑰處理 ===
@@ -601,7 +721,9 @@
             errorModal.classList.add('hidden');
         });
 
-        // === v16.0: 計算機邏輯 ===
+        // === v16.1: 計算機邏輯 ===
+
+        // 1. CrCl & IBW/ABW (C-G)
         function calculateCrClAndBw() {
             const age = parseFloat(calcAge.value);
             const weight = parseFloat(calcWeight.value);
@@ -614,12 +736,28 @@
 
             // 1. Calculate CrCl (Cockcroft-Gault)
             if (!isNaN(age) && !isNaN(weight) && !isNaN(scr) && scr > 0) {
-                let crcl = ((140 - age) * weight) / (72 * scr);
+                // 使用 C-G 公式的體重選擇邏輯
+                let weightForCrCl = weight; // 預設使用 ABW
+                
+                if (!isNaN(height)) {
+                    let ibw = (sex === 'Male') ? (50 + 2.3 * (height * 0.393701 - 60)) : (45.5 + 2.3 * (height * 0.393701 - 60));
+                    if (ibw < 0) ibw = (sex === 'Male') ? 50 : 45.5; // 身高低於 152.4cm 的簡易處理
+                    
+                    if (weight < ibw) {
+                        weightForCrCl = weight; // 體重過輕
+                    } else if (weight >= ibw && weight <= ibw * 1.2) {
+                        weightForCrCl = ibw; // 正常
+                    } else { // 肥胖 (TBW > 120% IBW)
+                        weightForCrCl = ibw + 0.4 * (weight - ibw); // AdjBW
+                    }
+                }
+                
+                let crcl = ((140 - age) * weightForCrCl) / (72 * scr);
                 if (sex === 'Female') {
                     crcl *= 0.85;
                 }
                 const crclVal = `${crcl.toFixed(1)} mL/min`;
-                crclResult.textContent = `CrCl: ${crclVal}`;
+                crclResult.textContent = `CrCl (C-G): ${crclVal}`;
                 crclResult.dataset.value = crclVal; // Store for prompt
                 crclCalculated = true;
             } else {
@@ -627,19 +765,10 @@
                 crclResult.dataset.value = "";
             }
 
-            // 2. Calculate IBW/ABW
+            // 2. Calculate IBW/ABW 評估 (v16.0 邏輯)
             if (!isNaN(height) && !isNaN(weight)) {
-                let ibw = 0;
-                if (height > 152) { // 假設公式適用於 152cm (60 inches) 以上
-                    if (sex === 'Male') {
-                        ibw = 50 + (0.9 * (height - 152)); // (2.3 * (height_in_inches - 60)) * 2.54 / 0.9 = 0.9
-                    } else { // Female
-                        ibw = 45.5 + (0.9 * (height - 152));
-                    }
-                } else {
-                    // 簡易處理 152cm 以下 (非標準 C-G，但為 IBW 提供一個基準)
-                    if (sex === 'Male') { ibw = 50; } else { ibw = 45.5; }
-                }
+                let ibw = (sex === 'Male') ? (50 + 2.3 * (height * 0.393701 - 60)) : (45.5 + 2.3 * (height * 0.393701 - 60));
+                if (ibw < 0) ibw = (sex === 'Male') ? 50 : 45.5;
 
                 const upperLimit = ibw * 1.2; // 20% 閾值
                 let assessment = "";
@@ -658,11 +787,12 @@
                 bwResult.dataset.value = "";
             }
 
-            if (!crclCalculated && !bwCalculated) {
+            if (!crclCalculated && !bwCalculated && (isNaN(age) || isNaN(weight) || isNaN(scr) || isNaN(height))) {
                 crclResult.textContent = "請輸入必填欄位";
             }
         }
 
+        // 2. CHA₂DS₂-VASc
         function calculateCha2ds2vasc() {
             let score = 0;
 
@@ -688,6 +818,68 @@
             const scoreVal = `${score} 分`;
             cha2ds2vascResult.textContent = `Score: ${scoreVal}`;
             cha2ds2vascResult.dataset.value = scoreVal; // Store for prompt
+        }
+
+        // 3. BSA (Mosteller)
+        function calculateBsa() {
+            const weight = parseFloat(calcWeight.value);
+            const height = parseFloat(calcHeight.value);
+            
+            if (!isNaN(weight) && !isNaN(height) && weight > 0 && height > 0) {
+                const bsa = Math.sqrt((height * weight) / 3600);
+                const bsaVal = `${bsa.toFixed(2)} m²`;
+                calcBsaResult.textContent = `BSA: ${bsaVal}`;
+                calcBsaResult.dataset.value = bsaVal;
+            } else {
+                calcBsaResult.textContent = "請輸入身高/體重";
+                calcBsaResult.dataset.value = "";
+            }
+        }
+
+        // 4. CKD-EPI 2021
+        function calculateCkdEpi() {
+            const age = parseFloat(calcAge.value);
+            const scr = parseFloat(calcScr.value);
+            const sex = calcSex.value;
+
+            if (isNaN(age) || isNaN(scr) || scr <= 0) {
+                calcCkdEpiResult.textContent = "請輸入年齡/SCr";
+                calcCkdEpiResult.dataset.value = "";
+                return;
+            }
+
+            let kappa = (sex === 'Female') ? 0.7 : 0.9;
+            let alpha = (sex === 'Female') ? -0.241 : -0.302;
+            let sexFactor = (sex === 'Female') ? 1.012 : 1;
+
+            let eGFR = 142 * Math.pow(Math.min(scr / kappa, 1), alpha) * Math.pow(Math.max(scr / kappa, 1), -1.200) * Math.pow(0.9938, age) * sexFactor;
+            
+            const eGFRVal = `${eGFR.toFixed(1)} mL/min/1.73m²`;
+            calcCkdEpiResult.textContent = `eGFR (CKD-EPI): ${eGFRVal}`;
+            calcCkdEpiResult.dataset.value = eGFRVal;
+        }
+
+        // 5. Child-Pugh Score
+        function calculateChildPugh() {
+            let score = 0;
+            score += parseInt(document.querySelector('input[name="cpAscites"]:checked').value);
+            score += parseInt(document.querySelector('input[name="cpEnceph"]:checked').value);
+            score += parseInt(document.querySelector('input[name="cpBili"]:checked').value);
+            score += parseInt(document.querySelector('input[name="cpAlb"]:checked').value);
+            score += parseInt(document.querySelector('input[name="cpInr"]:checked').value);
+
+            let grade = "";
+            if (score >= 5 && score <= 6) {
+                grade = "A (5-6 分)";
+            } else if (score >= 7 && score <= 9) {
+                grade = "B (7-9 分)";
+            } else if (score >= 10 && score <= 15) {
+                grade = "C (10-15 分)";
+            }
+
+            const scoreVal = `Child-Pugh: ${grade}`;
+            calcChildPughResult.textContent = scoreVal;
+            calcChildPughResult.dataset.value = scoreVal;
         }
 
 
@@ -792,9 +984,12 @@
             }
         });
 
-        // v16.0: 計算機按鈕監聽
+        // v16.1: 計算機按鈕監聽
         calculateCrClBwButton.addEventListener('click', calculateCrClAndBw);
         calculateCha2ds2vascButton.addEventListener('click', calculateCha2ds2vasc);
+        calculateBsaButton.addEventListener('click', calculateBsa);
+        calculateCkdEpiButton.addEventListener('click', calculateCkdEpi);
+        calculateChildPughButton.addEventListener('click', calculateChildPugh);
 
 
         queryGuidelinesButton.addEventListener('click', async () => {
@@ -859,10 +1054,13 @@
             const micromedexInfo = micromedexInfoInput.value.trim();
             const openevidenceInfo = openevidenceInfoInput.value.trim();
             
-            // v16.0: 獲取 "計算後" 的值
-            const cha2ds2Score = cha2ds2vascResult.dataset.value || "";
+            // v16.1: 獲取 "計算後" 的值
             const crcl = crclResult.dataset.value || "";
             const bwAssessment = bwResult.dataset.value || "";
+            const cha2ds2Score = cha2ds2vascResult.dataset.value || "";
+            const bsa = calcBsaResult.dataset.value || "";
+            const ckdEpi = calcCkdEpiResult.dataset.value || "";
+            const childPugh = calcChildPughResult.dataset.value || "";
 
             if (!patientInfo.trim()) {
                 showError("請輸入「病患核心資料」。");
@@ -883,10 +1081,10 @@
             sourcesTitle.textContent = '引用的指引與參考來源：';
             copyButton.disabled = true;
 
-            // v16.0: 更新 System Prompt
+            // v16.1: 更新 System Prompt
             const systemPrompt = `您是一位頂尖的臨床藥師，擁有豐富的經驗，並且隨時掌握最新的國際醫療指引。
 
-您的任務是 (v16.0)：
+您的任務是 (v16.1)：
 1.  仔細分析使用者在 [病患核心資料] 中提供的資訊 (病史、Lab、用藥等)。
 2.  自動識別出最相關的主要病症。
 3.  (最重要) **使用 Google 搜尋來查找並確認**該病症**「實際的最新指引版本和年份」**。
@@ -908,7 +1106,7 @@
 4.  (重要) **請分析**病患目前用藥清單中的**潛在藥物交互作用 (DDI)** 或**重複用藥 (Duplicate Therapy)**。您可以使用 Google 搜尋來輔助驗證。
 5.  (v14.1) 如果使用者提供了 [專科焦點] (例如 "心臟內科")，您的評估應更側重於該領域，並**優先參考該領域的權威指引** (如 ACC/AHA)。
 
-6.  (v16.0) 使用者已在 App 中使用計算機，並在 [APP計算結果] 欄位提供了「已算出的值」。您**必須**將這些「計算結果」整合到您的 (O) 客觀資料或 (A) 評估中。
+6.  (v16.1) 使用者已在 App 中使用計算機，並在 [APP計算結果] 欄位提供了「已算出的值」。您**必須**將這些「計算結果」整合到您的 (O) 客觀資料或 (A) 評估中。
     * **備援邏輯：** 如果 [APP計算結果] 欄位為空 (代表使用者未計算)，您才需要像以前一樣，自行從 [病患核心資料] 中抓取 eGFR, Lab, Age 等資訊來進行評估。
 
 7.  (v15.2) 使用者可能會在 [UpToDate 資料], [Micromedex 資料], [OpenEvidence 資料] 欄位提供補充資訊。
@@ -918,7 +1116,10 @@
     * **(v14.1 強制)** **必須明確提及**您參考的指引名稱與**「實際年份」** (例如："根據 GINA 2024 指引...")，**且該指引應優先來自第 3.1 點的清單**。
     * **(v14.1 強制)** **必須引用**該指引中的**「精確原文句子」**來支持您的臨床決策 (例如："...GINA 2024 建議... (原文: '...')")。
     * **必須包含**您對 DDI 或重複用藥的評估。
-    * **必須包含**對腎功能 (eGFR 或 您收到的 CrCl 計算值) 的考量與劑量評估。
+    * **必須包含**對腎功能 (eGFR 或 您收到的 CrCl (C-G), CKD-EPI) 的考量與劑量評估。
+    * **(v16.1)** **必須包含**對肝功能 (您收到的 Child-Pugh Score) 的考量與劑量評估。
+    * **(v16.1)** 若提供了 BSA，應評估是否需用於化療藥物等劑量計算。
+
 11. 在您的「Plan (P)」部分：
     * 您的所有建議都必須**符合**您在 (A) 中提到的最新指引。
 
@@ -926,7 +1127,7 @@
     * 如果您在 [APP計算結果] 中收到 "位於ABW範圍內" 或類似的描述，這代表病患的「實際體重」已超過「理想體重」一定比例。
     * 在這種情況下，您在 (A) 或 (P) 中評估藥物劑量時 (特別是水溶性藥物)，必須意識到**不應**直接使用實際體重 (TBW) 或理想體重 (IBW)，而應**建議**使用「調整體重 (Adjusted Body Weight, ABW)」來計算，並在筆記中提及這一點 (例如： "病患體重位於ABW範圍，建議使用 ABW (Adjusted Body Weight) 進行劑量計算..."）。
 
-13. (*** v16.0 格式要求 ***)
+13. (*** v16.1 格式要求 ***)
     * 您的回覆**必須**嚴格遵守此格式：
     [完整的 SOAP 筆記 (S, O, A, P)]
     ---GUIDELINES_USED---
@@ -936,24 +1137,27 @@
     * (v15.2) [若有使用 UpToDate, 請註明]
     * (v15.2) [若有使用 Micromedex, 請註明]
     * (v15.2) [若有使用 OpenEvidence, 請註明]
-    * (v16.0) [若有使用 APP計算結果 (CrCl/BW/CHA2DS2-VASc), 請註明]
+    * (v16.1) [若有使用 APP計算結果 (CrCl/BW/CHA2DS2-VASc/BSA/CKD-EPI/Child-Pugh), 請註明]
 
 14. (*** v14.4 格式禁止 ***)
     * **禁止**在您的回覆中使用任何 LaTeX 語法 (例如 $...$ 或 $$...$$ 或 \\text{})。
     * 必須直接使用 Unicode 字元 (例如：β, α, °, ≈, mmHg)。`;
 
-            // v16.0: 更新 User Prompt
+            // v16.1: 更新 User Prompt
             let userPrompt = `--- 病患核心資料 (必填) START ---
 ${patientInfo}
 --- 病患核心資料 END ---
 `;
             if (specialtyFocus) { userPrompt += `\n--- 專科焦點 (選填) ---\n${specialtyFocus}\n`; }
             
-            // v16.0: 組合計算結果
+            // v16.1: 組合計算結果
             let calcResults = "";
             if (crcl) { calcResults += `Creatine Clearance (Cockcroft-Gault): ${crcl}\n`; }
+            if (ckdEpi) { calcResults += `eGFR (CKD-EPI 2021): ${ckdEpi}\n`; }
             if (bwAssessment) { calcResults += `體重評估 (IBW/ABW): ${bwAssessment}\n`; }
+            if (bsa) { calcResults += `Body Surface Area (BSA): ${bsa}\n`; }
             if (cha2ds2Score) { calcResults += `CHA2DS2-VASc Score: ${cha2ds2Score}\n`; }
+            if (childPugh) { calcResults += `肝功能 (Child-Pugh Score): ${childPugh}\n`; }
             
             if (calcResults) {
                 userPrompt += `\n--- APP計算結果 (選填) START ---\n${calcResults.trim()}\n--- APP計算結果 END ---\n`;
@@ -1060,7 +1264,7 @@ ${patientInfo}
             }
         });
 
-        // v16.0: 更新清除按鈕邏輯
+        // v16.1: 更新清除按鈕邏輯
         clearInputsButton.addEventListener('click', () => {
             patientInfoInput.value = '';
             specialtyFocusSelect.value = '';
@@ -1068,7 +1272,7 @@ ${patientInfo}
             micromedexInfoInput.value = '';
             openevidenceInfoInput.value = '';
             
-            // Clear CrCl & IBW/ABW
+            // Clear CrCl & IBW/ABW (calc 1)
             calcSex.value = 'Male';
             calcAge.value = '';
             calcWeight.value = '';
@@ -1079,7 +1283,7 @@ ${patientInfo}
             bwResult.textContent = '';
             bwResult.dataset.value = '';
 
-            // Clear CHA2DS2-VASc
+            // Clear CHA2DS2-VASc (calc 2)
             c2vAgeLess65.checked = true;
             document.getElementById('c2vSexMale').checked = true;
             c2vChf.checked = false;
@@ -1089,6 +1293,23 @@ ${patientInfo}
             c2vVd.checked = false;
             cha2ds2vascResult.textContent = '';
             cha2ds2vascResult.dataset.value = '';
+
+            // Clear BSA (calc 3)
+            calcBsaResult.textContent = '';
+            calcBsaResult.dataset.value = '';
+            
+            // Clear CKD-EPI (calc 4)
+            calcCkdEpiResult.textContent = '';
+            calcCkdEpiResult.dataset.value = '';
+            
+            // Clear Child-Pugh (calc 5)
+            document.querySelector('input[name="cpAscites"][value="1"]').checked = true;
+            document.querySelector('input[name="cpEnceph"][value="1"]').checked = true;
+            document.querySelector('input[name="cpBili"][value="1"]').checked = true;
+            document.querySelector('input[name="cpAlb"][value="1"]').checked = true;
+            document.querySelector('input[name="cpInr"][value="1"]').checked = true;
+            calcChildPughResult.textContent = '';
+            calcChildPughResult.dataset.value = '';
 
             termsCheckbox.checked = false;
             generateButton.disabled = true;
