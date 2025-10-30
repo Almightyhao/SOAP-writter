@@ -27,7 +27,7 @@ AI 依據最新臨床指引與即時計算，自動生成 SOAP 草稿
 | 🧍 **BSA (Mosteller)** | **(v16.1 新增)** 自動帶入 C-G 欄位，計算體表面積 (m²) |
 | 🫁 **Child-Pugh Score** | **(v16.1 新增)** 點選 Bilirubin, Albumin, INR, 腹水, 肝腦病變，評估肝功能等級 (A, B, C) |
 | ❤️ **CHA₂DS₂-VASc Score** | 點選病史（如 CHF, HT, DM...）計算中風風險分數 |
-| 🔄 **智慧型自動計算** | **(v16.2 升級)** 如果 CrCl/eGFR/BSA 計算機**空白**，AI 分析時會**自動**從「病患核心資料」中解析 Age/Sex/BW/Height/SCr 並回填計算 |
+| 🔄 **智慧型自動計算** | **(v16.2 升級)** 如果 CrCl/eGFR/BSA 計算機**空白**，AI 分析時會**自動**從「病患核心資料」中解析 Age/Sex/BW/Height/SCr 並計算 |
 
 ---
 
