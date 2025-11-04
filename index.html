@@ -994,30 +994,26 @@
             }
         }
 
-        // === 錯誤處理 (v17.4 -> v18.1) ===
         function showError(message) {
-            let activeKey = "";
+            let activeKey = ""; // 宣告 Gemini 變數
+            let activeApiKey = ""; // 宣告 Grok 變數
             let provider = "Gemini";
-            try {
-                if (apiProviderSelect) {
-                    provider = apiProviderSelect.value;
-                }
-            } catch(e) {/* ignore if element not visible */}
+            try { if (apiProviderSelect) { provider = apiProviderSelect.value; } } catch(e) {/* ignore if element not visible */}
             
             if (provider === 'gemini') activeKey = appSettings.apiKeys.gemini;
-            if (provider === 'grok') activeApiKey = appSettings.apiKeys.grok;
+            if (provider === 'grok') activeApiKey = appSettings.apiKeys.grok; // Grok 存到 Grok 變數 (正確)
 
-            if (activeKey === "" && (message.includes("API") || message.includes("金鑰"))) {
+            // ***【主要修正處】***
+            // 必須分開檢查
+            if (provider === 'gemini' && activeKey === "" && (message.includes("API") || message.includes("金鑰"))) {
+                errorMessage.textContent = `API 金鑰尚未設定或無效。請前往「設定」頁面輸入並儲存 ${provider} 金鑰。`;
+            } else if (provider === 'grok' && activeApiKey === "" && (message.includes("API") || message.includes("金鑰"))) {
                 errorMessage.textContent = `API 金鑰尚未設定或無效。請前往「設定」頁面輸入並儲存 ${provider} 金鑰。`;
             } else {
                 errorMessage.textContent = message || "發生未知的錯誤。";
             }
             errorModal.classList.remove('hidden');
         }
-        closeModalButton.addEventListener('click', () => {
-            errorModal.classList.add('hidden');
-        });
-        
         // === v18.0: 純計算邏輯 (Pure Functions) ===
         function setCalcResult(element, text, isNoData = false) {
             element.textContent = text;
@@ -2058,4 +2054,5 @@
     </body>
 
 </html>
+
 
