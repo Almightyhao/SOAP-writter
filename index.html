@@ -1789,13 +1789,22 @@
                 return;
             }
             
-            const provider = apiProviderSelect.value;
-            let activeApiKey = "";
-            if (provider === 'gemini') activeApiKey = appSettings.apiKeys.gemini;
-            if (provider === 'grok') activeKey = appSettings.apiKeys.grok;
-            if (activeApiKey === "") {
-                showError(`請先在「設定」頁面設定 ${provider} 的 API 金鑰。`);
-                return;
+           const provider = apiProviderSelect.value;
+            let activeKey = "";      // 宣告 Gemini 變數
+            let activeApiKey = "";   // 宣告 Grok 變數
+
+            if (provider === 'gemini') {
+                activeKey = appSettings.apiKeys.gemini; // Gemini 存到 activeKey
+                if (activeKey === "") {
+                    showError(`請先在「設定」頁面設定 ${provider} 的 API 金鑰。`);
+                    return;
+                }
+            } else if (provider === 'grok') {
+                activeApiKey = appSettings.apiKeys.grok; // Grok 存到 activeApiKey
+                if (activeApiKey === "") {
+                    showError(`請先在「設定」頁面設定 ${provider} 的 API 金鑰。`);
+                    return;
+                }
             }
             
             const patientInfo = patientInfoInput.value;
@@ -2049,3 +2058,4 @@
     </body>
 
 </html>
+
