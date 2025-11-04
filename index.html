@@ -1005,7 +1005,7 @@
             } catch(e) {/* ignore if element not visible */}
             
             if (provider === 'gemini') activeKey = appSettings.apiKeys.gemini;
-            if (provider === 'grok') activeKey = appSettings.apiKeys.grok;
+            if (provider === 'grok') activeApiKey = appSettings.apiKeys.grok;
 
             if (activeKey === "" && (message.includes("API") || message.includes("金鑰"))) {
                 errorMessage.textContent = `API 金鑰尚未設定或無效。請前往「設定」頁面輸入並儲存 ${provider} 金鑰。`;
@@ -2047,4 +2047,5 @@
 
     </script>
     </body>
+
 </html>
