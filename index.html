@@ -32,14 +32,14 @@
         .project-delete-btn { background-color: #fee2e2; color: #dc2626; border-radius: 9999px; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center; font-weight: bold; transition: all 0.2s; }
         .project-delete-btn:hover { background-color: #dc2626; color: white; }
         
-        /* CSS for Chart Cards */
+        /* 圖表卡片 (Grid Layout) */
         .chart-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
         @media (min-width: 768px) { .chart-grid { grid-template-columns: repeat(2, 1fr); } }
         .chart-card { background-color: white; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); padding: 1.5rem; border: 1px solid #f3f4f6; transition: transform 0.2s; }
         .chart-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
         .chart-title { text-align: center; font-size: 1.125rem; font-weight: 700; color: #374151; margin-bottom: 1rem; }
 
-        /* General Styles */
+        /* 通用樣式 */
         .prose pre { background-color: #f9fafb; color: #1f2937; padding: 1rem; border-radius: 0.5rem; border: 1px solid #e5e7eb; white-space: pre-wrap; font-family: inherit; font-size: 0.95rem; }
         .terms-section { background-color: #fffbeb; border: 1px solid #fcd34d; color: #92400e; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem; }
         .calc-button { background-color: #10b981; color: white; font-weight: 600; padding: 0.5rem 1rem; border-radius: 0.375rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: background-color 0.2s; }
@@ -58,7 +58,7 @@
     <div class="container mx-auto max-w-6xl p-4 py-8">
         <header class="text-center mb-8">
             <h1 class="text-3xl md:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500">智能藥師 SOAP小幫手 (v21.7)</h1>
-            <p class="mt-2 text-lg text-gray-600">專案管理・AI 驅動的指引查核・可視化圖表</p>
+            <p class="mt-2 text-lg text-gray-600">專案管理・AI 驅動的指引查核・可視化圖表 (修復版)</p>
         </header>
 
         <nav class="bg-white p-2 rounded-lg shadow-md mb-6 flex flex-wrap items-center justify-center gap-2 md:gap-4">
@@ -81,12 +81,12 @@
                     </div>
                 </section>
                 <section class="bg-white p-6 rounded-xl shadow-xl">
-                    <h2 class="text-2xl font-semibold mb-4 text-gray-700 border-b pb-2">功能說明</h2>
+                    <h2 class="text-2xl font-semibold mb-4 text-gray-700 border-b pb-2">更新說明</h2>
                     <div class="prose text-sm text-gray-600 mt-4">
                         <ul class="list-disc pl-5">
-                            <li><strong>v21.7 修正：</strong> 徹底解決甘特圖日期被吃掉的問題 (Regex 優化)。</li>
-                            <li><strong>v21.5 美化：</strong> 甘特圖採用藥丸形狀設計，Lab 圖表支援自動分組與雙 Y 軸。</li>
-                            <li><strong>v21.4 增強：</strong> Lab 數據支援無冒號的鬆散格式輸入。</li>
+                            <li><strong>v21.7 (Critical Fix)：</strong> 修復甘特圖在「緊湊日期格式」(如 10/1-10/25) 下解析失敗的問題。</li>
+                            <li><strong>v21.5 UI：</strong> 採用藥丸形狀 (Pill Shape) 的現代化甘特圖。</li>
+                            <li><strong>v21.3 UI：</strong> Lab 圖表支援自動分組 (AST/ALT 合併) 與雙 Y 軸 (WBC/CRP)。</li>
                         </ul>
                     </div>
                 </section>
@@ -146,16 +146,17 @@
                         
                         <div class="mb-4">
                             <label for="labDataInput" class="block text-sm font-medium text-gray-600 mb-2">
-                                Lab 數據 (製圖用) <span class="text-xs text-blue-600 font-bold">* 支援無冒號與自動分組</span>
+                                Lab 數據 (製圖用) <span class="text-xs text-blue-600 font-bold">* 支援無冒號、自動分組與雙軸</span>
                             </label>
                             <textarea id="labDataInput" rows="4" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="例如：
 AST 40 (10/1)
 Glucose (PC) 130 (10/2)
-WBC: 15 (10/3)"></textarea>
+WBC 15 (10/3)
+CRP 2.5 (10/3)"></textarea>
                         </div>
                         <div class="mb-4">
                             <label for="medDataInput" class="block text-sm font-medium text-gray-600 mb-2">
-                                用藥史 (甘特圖用) <span class="text-xs text-blue-600 font-bold">* v21.7 修復日期解析問題</span>
+                                用藥史 (甘特圖用) <span class="text-xs text-blue-600 font-bold">* v21.7 修復解析 Bug</span>
                             </label>
                             <textarea id="medDataInput" rows="4" class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="例如：
 vanco IV 2g (10/1-10/25)
@@ -281,7 +282,7 @@ Qtern 20mg (10/25-11/5)"></textarea>
         let appSettings = { apiKeys: { gemini: "", grok: "" }, projects: [] };
         let currentProjectId = null; 
         let activeCharts = {}; 
-        const appStorageKey = 'smartPharmacistSettings_v21.7'; // New storage key
+        const appStorageKey = 'smartPharmacistSettings_v21.7';
 
         const views = { home: document.getElementById('view-home'), soapNote: document.getElementById('view-soap-note'), calculator: document.getElementById('view-calculator'), settings: document.getElementById('view-settings') };
         const navButtons = { home: document.getElementById('nav-home'), soapNote: document.getElementById('nav-soap-note'), calculator: document.getElementById('nav-calculator'), settings: document.getElementById('nav-settings') };
@@ -315,7 +316,8 @@ Qtern 20mg (10/25-11/5)"></textarea>
             const lines = text.split('\n');
             const valueDateRegex = /(\d+(?:\.\d+)?)\s*.*?\s*\(?([\d\.\/-]+)\)?/g;
             const looseLineRegex = /^\s*(.*?)\s+(\d+(?:\.\d+)?)\s*.*?\s*\(?([\d\.\/-]+)\)?/;
-            const ganttRegex = /^\s*.*?(\([\d\.\/-]+\s*(?:-|~|to)\s*[\d\.\/-]+\))/; // Gantt check
+            // 防止 Lab 解析器誤讀甘特圖 (加強版 Regex)
+            const ganttRegex = /^\s*.*?(\([\d\.\/-]+\s*(?:-|~|to)\s*[\d\.\/-]+\))/; 
 
             lines.forEach(line => {
                 if (!line.trim() || ganttRegex.test(line)) return; 
@@ -379,6 +381,7 @@ Qtern 20mg (10/25-11/5)"></textarea>
             let usedKeys = new Set();
             let processedGroups = [];
 
+            // 處理分組
             labConfig.groups.forEach(group => {
                 let datasets = [];
                 let hasDualAxis = false;
@@ -403,6 +406,7 @@ Qtern 20mg (10/25-11/5)"></textarea>
                 if (datasets.length > 0) processedGroups.push({ title: group.name, datasets: datasets, hasDualAxis: hasDualAxis });
             });
 
+            // 處理未分組
             Object.keys(labData).forEach(key => {
                 if (!usedKeys.has(key) && labData[key].data.length > 0) {
                     const color = '#' + (Math.random().toString(16) + '000000').substring(2, 8);
@@ -419,6 +423,7 @@ Qtern 20mg (10/25-11/5)"></textarea>
                 }
             });
 
+            // 繪圖
             processedGroups.forEach((group, index) => {
                 const cardDiv = document.createElement('div');
                 cardDiv.className = 'chart-card';
@@ -485,7 +490,8 @@ Qtern 20mg (10/25-11/5)"></textarea>
                     const startDate = parseChartDate(match[2].trim());
                     let endDate = parseChartDate(match[3].trim());
 
-                    if (medName && startDate && endDate) {
+                    // 安全檢查: 確保日期是有效的 (避免 NaN 造成 Chart.js 畫出奇怪的 1900年 或 空白)
+                    if (medName && startDate && !isNaN(startDate) && endDate && !isNaN(endDate)) {
                         if (endDate < startDate) endDate.setFullYear(startDate.getFullYear() + 1);
                         // +1天
                         const displayEndDate = new Date(endDate);
