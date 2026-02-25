@@ -534,8 +534,8 @@
         let currentProjectId = null; 
         let activeCharts = {}; // v21.0: 改為物件，方便管理 Lab 和 Gantt
 
-        // v17.2: 模型名稱
-        const geminiModelName = "gemini-3-flash-preview";
+       // v17.2: 模型名稱 (改為 let 以便動態更新，並設定一個最穩定的預設值)
+        let geminiModelName = "gemini-1.5-flash"; 
         const geminiApiUrlBase = "https://generativelanguage.googleapis.com/v1beta/models/";
         
         // v18.0: Grok 模型名稱
@@ -1688,7 +1688,53 @@
                 }
             }
         }
-        
+        // === v21.4: 自動偵測最新可用模型 ===
+        async function autoDetectBestModel() {
+            const apiKey = appSettings.apiKeys.gemini;
+            if (!apiKey) return;
+
+            try {
+                // 呼叫 Google API 取得模型清單
+                const response = await fetch(`${geminiApiUrlBase}?key=${apiKey}`);
+                if (!response.ok) throw new Error("無法獲取模型清單");
+                
+                const data = await response.json();
+                
+                // 過濾出可用的 gemini 生成模型
+                const availableModels = data.models
+                    .filter(m => m.name.includes('gemini') && m.supportedGenerationMethods.includes('generateContent'))
+                    .map(m => m.name.replace('models/', ''));
+
+                // 定義我們想要的優先順序 (越前面越優先)
+                const priorityKeywords = [
+                    'gemini-3-flash', 
+                    'gemini-3-pro', 
+                    'gemini-2.5-flash', 
+                    'gemini-2.0-flash', 
+                    'gemini-1.5-pro',
+                    'gemini-1.5-flash'
+                ];
+                
+                let bestMatch = null;
+                for (const kw of priorityKeywords) {
+                    bestMatch = availableModels.find(m => m.includes(kw));
+                    if (bestMatch) break;
+                }
+
+                if (bestMatch) {
+                    geminiModelName = bestMatch;
+                    console.log("✅ 成功自動切換至模型:", geminiModelName);
+                    
+                    // 動態更新介面上的下拉選單文字
+                    const optionEl = document.querySelector('#apiProviderSelect option[value="gemini"]');
+                    if (optionEl) {
+                        optionEl.textContent = `Google Gemini (${geminiModelName}) - 自動偵測`;
+                    }
+                }
+            } catch (e) {
+                console.warn("⚠️ 自動偵測模型失敗，將使用預設模型:", e.message);
+            }
+        }
         // === v18.1: 事件監聽器 (Event Listeners) ===
 
         // 頁面載入時
@@ -2117,5 +2163,6 @@
     </script>
 </body>
 </html>
+
 
 
