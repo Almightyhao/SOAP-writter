@@ -1738,9 +1738,16 @@
         // === v18.1: 事件監聽器 (Event Listeners) ===
 
         // 頁面載入時
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             loadAppSettings();      // 載入 localStorage
             updateSettingsUI();     // 更新「設定」頁面的 UI 狀態
+            
+            // --- 🚀 新增：啟動時自動偵測最佳模型 ---
+            if (appSettings.apiKeys.gemini) {
+                await autoDetectBestModel();
+            }
+            // ---------------------------------------
+
             renderProjectList();    // 渲染「主頁」的專案列表
             fetchReadme();          // 抓取 GitHub README
             showView('home');       // 預設顯示主頁
@@ -2163,6 +2170,7 @@
     </script>
 </body>
 </html>
+
 
 
 
