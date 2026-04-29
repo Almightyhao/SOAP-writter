@@ -81,6 +81,14 @@
             border: 1px solid #e2e8f0; border-radius: 0.75rem; transition: all 0.2s; outline: none;
         }
         .input-base:focus { background-color: white; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+
+        /* 製圖工具新增樣式 */
+        .chart-wrapper { position: relative; margin-bottom: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 1rem; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+        .gantt-scroll-container { width: 100%; overflow-x: auto; overflow-y: auto; max-height: 500px; }
+        .chart-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.5rem; }
+        .chart-title { font-size: 0.875rem; font-weight: 700; color: #334155; margin-right: auto; }
+        .chart-btn { font-size: 0.75rem; padding: 0.3rem 0.6rem; background: #f1f5f9; color: #475569; border-radius: 0.375rem; cursor: pointer; transition: all 0.2s; font-weight: 600; border: 1px solid #e2e8f0; }
+        .chart-btn:hover { background: #e2e8f0; color: #0f172a; }
     </style>
 </head>
 <body class="text-slate-800 antialiased selection:bg-blue-100 selection:text-blue-900">
@@ -265,12 +273,12 @@
                             
                             <div class="space-y-4">
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Lab 數據 <span class="text-[10px] text-slate-400 normal-case tracking-normal ml-1">(格式: SCr: 1.2(10/1), 1.5(10/2))</span></label>
-                                    <textarea id="labDataInput" rows="3" class="input-base resize-y" placeholder="一行一個 Lab 項目..."></textarea>
+                                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Lab 數據</label>
+                                    <textarea id="labDataInput" rows="3" class="input-base resize-y font-mono text-sm" placeholder="在此貼上 Lab 數據..."></textarea>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">用藥史 <span class="text-[10px] text-slate-400 normal-case tracking-normal ml-1">(格式: Vanco 1g (10/1-10/5))</span></label>
-                                    <textarea id="medDataInput" rows="3" class="input-base resize-y" placeholder="一行一個藥物..."></textarea>
+                                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">用藥史</label>
+                                    <textarea id="medDataInput" rows="3" class="input-base resize-y font-mono text-sm" placeholder="在此貼上處方表格..."></textarea>
                                 </div>
                             </div>
                         </div>
@@ -329,8 +337,14 @@
                                 <span class="bg-blue-100 text-blue-600 p-1 rounded-md"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg></span>
                                 視覺化圖表
                             </h3>
-                            <div id="labChartsContainer" class="mb-6"><div id="labChartsGoHere" class="space-y-4"></div><p id="noLabChartMessage" class="hidden text-xs text-slate-400">無可繪製的 Lab 數據</p></div>
-                            <div id="ganttChartContainer" class="mt-6 pt-4 border-t border-slate-100"><div id="ganttChartGoHere" class="relative w-full"><canvas id="ganttChartCanvas"></canvas></div><p id="noGanttChartMessage" class="hidden text-xs text-slate-400">無可繪製的用藥史</p></div>
+                            <div id="labChartsContainer" class="mb-6">
+                                <div id="labChartsGoHere" class="space-y-4"></div>
+                                <p id="noLabChartMessage" class="hidden text-xs text-slate-400">無可繪製的 Lab 數據</p>
+                            </div>
+                            <div id="ganttChartContainer" class="mt-6 pt-4 border-t border-slate-100">
+                                <div id="ganttChartGoHere" class="relative w-full"></div>
+                                <p id="noGanttChartMessage" class="hidden text-xs text-slate-400">無可繪製的用藥史</p>
+                            </div>
                         </div>
 
                         <div class="glass-card p-6 rounded-2xl flex flex-col h-full min-h-[500px] border-l-4 border-l-indigo-500">
@@ -544,10 +558,10 @@
     </div>
 
     <script>
-        // === 全域變數與設定 (原封不動保留) ===
+        // === 全域變數與設定 ===
         let appSettings = { apiKeys: { gemini: "", grok: "" }, projects: [] };
         let currentProjectId = null; 
-        let activeCharts = {}; 
+        let activeCharts = []; // 改為陣列以配合新版製圖邏輯
 
         let geminiModelName = "gemini-1.5-flash"; 
         const geminiApiUrlBase = "https://generativelanguage.googleapis.com/v1beta/models/";
@@ -557,7 +571,20 @@
         const appStorageKey = 'smartPharmacistSettings_v21.2';
         const githubReadmeUrl = "https://api.github.com/repos/Almightyhao/SOAP-writter/readme";
 
-        // === DOM 元素綁定 (維持原有 ID 綁定不變) ===
+        // === 製圖常數設定 (新增) ===
+        const CHART_COLORS = { orange: 'rgb(249, 115, 22)', blue: 'rgb(59, 130, 246)', purple: 'rgb(168, 85, 247)', red: 'rgb(239, 68, 68)', teal: 'rgb(20, 184, 166)', gray: 'rgb(107, 114, 128)' };
+        const LAB_GROUPS = [
+            { name: '肝功能 (Liver)', keys: ['AST', 'GOT', 'ALT', 'GPT', 'ALBUMIN', 'BILIRUBINTOTAL', 'BILIRUBIN', 'TBIL'], colors: [CHART_COLORS.orange, CHART_COLORS.red, CHART_COLORS.teal, CHART_COLORS.purple], type: 'dual', leftKeys: ['AST', 'GOT', 'ALT', 'GPT'], rightKeys: ['ALBUMIN', 'BILIRUBINTOTAL', 'BILIRUBIN', 'TBIL'] },
+            { name: '腎功能 (Renal)', keys: ['CREATININE', 'CREA', 'SCR', 'BUN'], colors: [CHART_COLORS.red, CHART_COLORS.blue], type: 'dual', leftKeys: ['BUN'], rightKeys: ['CREATININE', 'CREA', 'SCR'] },
+            { name: '發炎指標 (Infection)', keys: ['WBC', 'CRP', 'NEUTROPHIL', 'SEG', 'PCT'], colors: [CHART_COLORS.blue, CHART_COLORS.purple, CHART_COLORS.teal], type: 'dual', leftKeys: ['WBC', 'NEUTROPHIL', 'SEG'], rightKeys: ['CRP', 'PCT'] },
+            { name: '電解質 (Electrolytes)', keys: ['NA', 'SODIUM', 'K', 'POTASSIUM', 'CL', 'CHLORIDE', 'CA', 'CALCIUM'], colors: [CHART_COLORS.teal, CHART_COLORS.orange, CHART_COLORS.purple, CHART_COLORS.gray], type: 'normal' },
+            { name: '血糖 (Glucose)', keys: ['GLU', 'GLUCOSE', 'AC', 'PC'], colors: [CHART_COLORS.orange], type: 'normal' },
+            { name: '血液 (Blood)', keys: ['EOSINOPHIL', 'LYMPHOCYTE', 'MCH', 'PLT', 'HCT', 'HB', 'HEMOGLOBIN', 'MCHC', 'MCV', 'RBC'], colors: [CHART_COLORS.red, CHART_COLORS.blue, CHART_COLORS.gray, CHART_COLORS.teal, CHART_COLORS.orange, CHART_COLORS.purple, CHART_COLORS.red, CHART_COLORS.blue, CHART_COLORS.gray], type: 'normal' },
+            { name: '心臟指標 (Cardiac)', keys: ['PROBNP', 'TROPONIN', 'TROPONINI'], colors: [CHART_COLORS.red, CHART_COLORS.blue], type: 'normal' },
+            { name: '凝血指標 (Coagulation)', keys: ['APTT', 'INR', 'PT'], colors: [CHART_COLORS.purple, CHART_COLORS.teal], type: 'normal' }
+        ];
+
+        // === DOM 元素綁定 ===
         const views = { home: document.getElementById('view-home'), soapNote: document.getElementById('view-soap-note'), calculator: document.getElementById('view-calculator'), settings: document.getElementById('view-settings') };
         const navButtons = { home: document.getElementById('nav-home'), soapNote: document.getElementById('nav-soap-note'), calculator: document.getElementById('nav-calculator'), settings: document.getElementById('nav-settings') };
         
@@ -610,7 +637,7 @@
         const labChartsGoHere = document.getElementById('labChartsGoHere');
         const noLabChartMessage = document.getElementById('noLabChartMessage');
         const ganttChartContainer = document.getElementById('ganttChartContainer');
-        const ganttChartCanvas = document.getElementById('ganttChartCanvas');
+        const ganttChartGoHere = document.getElementById('ganttChartGoHere'); // 更新綁定
         const noGanttChartMessage = document.getElementById('noGanttChartMessage');
 
         const errorModal = document.getElementById('errorModal');
@@ -659,17 +686,15 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Tab Logic for Reference Sources (Updated to match new UI classes)
+        // Tab Logic for Reference Sources
         document.querySelectorAll('.ref-tab').forEach(tab => {
             tab.addEventListener('click', (e) => {
-                // Reset styling
                 document.querySelectorAll('.ref-tab').forEach(t => {
                     t.classList.remove('bg-white', 'text-blue-600', 'shadow-sm', 'font-bold');
                     t.classList.add('text-slate-500', 'font-medium');
                 });
                 document.querySelectorAll('.ref-content').forEach(c => c.classList.add('hidden'));
                 
-                // Active styling
                 e.target.classList.remove('text-slate-500', 'font-medium');
                 e.target.classList.add('bg-white', 'text-blue-600', 'shadow-sm', 'font-bold');
                 document.getElementById(e.target.dataset.target).classList.remove('hidden');
@@ -888,7 +913,6 @@
         function showError(msg) { 
             errorMessage.textContent = msg; 
             errorModal.classList.remove('hidden'); 
-            // modal animation
             errorModal.firstElementChild.classList.remove('scale-95');
             errorModal.firstElementChild.classList.add('scale-100');
         }
@@ -975,72 +999,315 @@
             return [crcl, bw, egfr, "CHA₂DS₂-VASc: 需手動", "Child-Pugh: 需手動"];
         }
 
-        // === 製圖解析與渲染 ===
+        // === 下載圖表通用函數 ===
+        window.downloadChart = (id, name) => { 
+            const c = document.getElementById(id); 
+            if(!c) return;
+            const a = document.createElement('a'); 
+            a.download = name; 
+            a.href = c.toDataURL(); 
+            a.click(); 
+        };
+
+        // === 製圖解析與渲染 (從 v22.7.6 移植) ===
         function parseChartDate(str) {
-            const p = str.split(/[\/-]/);
-            if(p.length===3) return new Date(p[0]<200?parseInt(p[0])+1911:p[0], p[1]-1, p[2]);
-            if(p.length===2) { let d=new Date(new Date().getFullYear(), p[0]-1, p[1]); if(d.getMonth()>new Date().getMonth()+1) d.setFullYear(d.getFullYear()-1); return d; }
-            return null;
+            if (!str) return null;
+            const match = str.match(/(\d{1,2})\/(\d{1,2})(?:\s+(\d{1,2}):(\d{1,2}))?/);
+            if (!match) return null;
+            const y = 2026;
+            const m = parseInt(match[1]) - 1;
+            const d = parseInt(match[2]);
+            const hour = match[3] ? parseInt(match[3]) : 0;
+            const min = match[4] ? parseInt(match[4]) : 0;
+            return new Date(y, m, d, hour, min);
         }
 
-        function parseLabDataForChart(text) {
-            const d = {}; const lines = text.split('\n'); const pReg = /(\d+(?:\.\d+)?)\s*.*?\s*\(?([\d\.\/-]+)\)?/g;
+        function parseLab(text) {
+            const lab = {};
+            const lines = text.split('\n').filter(l => l.trim());
+            const regex = /(\d+(?:\.\d+)?)\s*.*?\s*\(?([\d\.\/-]+(?:\s+\d+:\d+)?)\)?/g;
+            
             lines.forEach(l => {
-                if(/^\s*.*?(\([\d\.\/-]+\s*-\s*[\d\.\/-]+\))/.test(l)) return;
-                let idx = l.indexOf(':'); if(idx===-1) idx = l.indexOf('：'); if(idx===-1) return;
-                const name = l.substring(0, idx).trim(); const valStr = l.substring(idx+1);
-                if(!name) return; if(!d[name]) d[name]={labels:[], data:[]};
-                let m; while((m=pReg.exec(valStr))!==null){ const val=parseFloat(m[1]), dt=parseChartDate(m[2]); if(!isNaN(val)&&dt){ d[name].labels.push(dt); d[name].data.push(val); } }
-            }); return d;
-        }
-
-        function parseMedDataForGantt(text) {
-            const d = {labels:[], data:[], colors:[]}; const lines = text.split('\n'); const colors=['#3B82F6','#10B981','#F59E0B','#8B5CF6']; let cIdx=0;
-            lines.forEach(l => {
-                if(!/\([\d\.\/-]+\s*-\s*[\d\.\/-]+\)/.test(l)) return;
-                const m = l.match(/^\s*(.+?)\s*\(?([\d\.\/-]+)\s*-\s*([\d\.\/-]+)\)?\s*$/i);
-                if(m) {
-                    const name=m[1].trim().replace(/[:：]$/,''), start=parseChartDate(m[2]), end=parseChartDate(m[3]);
-                    if(name&&start&&end){ if(end<start)end.setFullYear(end.getFullYear()+1); end.setDate(end.getDate()+1); d.labels.push(name); d.data.push([start,end]); d.colors.push(colors[cIdx%colors.length]); cIdx++;}
-                }
-            }); return d;
-        }
-
-        function destroyActiveCharts() { Object.values(activeCharts).forEach(c => c && c.destroy()); activeCharts={}; labChartsGoHere.innerHTML=''; }
-
-        function renderLabCharts(data) {
-            let count=0; labChartsGoHere.innerHTML='';
-            Object.keys(data).forEach(n => {
-                if(data[n].data.length>1) {
-                    const id=`chart_${n}`; const c=document.createElement('canvas'); c.id=id; c.style.maxHeight='220px'; labChartsGoHere.appendChild(c);
-                    activeCharts[id] = new Chart(c.getContext('2d'), { type:'line', data:{ datasets:[{label:n, data:data[n].data.map((v,i)=>({x:data[n].labels[i],y:v})), borderColor:'#3B82F6', backgroundColor:'rgba(59, 130, 246, 0.1)', tension:0.3, fill:true, pointBackgroundColor:'#fff', pointBorderWidth:2}] }, options:{ responsive:true, scales:{x:{type:'time', time:{unit:'day', tooltipFormat:'yyyy-MM-dd'}}} } }); count++;
+                if (!l.includes(':') && !l.includes('：')) return;
+                const parts = l.split(/[:：]/);
+                const name = parts[0].trim();
+                const key = name.toUpperCase().replace(/[^A-Z0-9]/g, '');
+                if (!lab[key]) lab[key] = { label: name, data: [] };
+                let m; while ((m = regex.exec(parts[1])) !== null) {
+                    const d = parseChartDate(m[2]);
+                    if(d) lab[key].data.push({ x: d, y: parseFloat(m[1]) });
                 }
             });
-            if(count>0){ labChartsContainer.classList.remove('hidden'); noLabChartMessage.classList.add('hidden'); } else { labChartsContainer.classList.add('hidden'); noLabChartMessage.classList.remove('hidden'); }
-            return count;
+
+            Object.keys(lab).forEach(key => {
+                const dataPoints = lab[key].data;
+                const dailyGroups = {};
+                dataPoints.forEach(pt => {
+                    const d = new Date(pt.x);
+                    d.setHours(0, 0, 0, 0);
+                    const timeKey = d.getTime();
+                    if (!dailyGroups[timeKey]) dailyGroups[timeKey] = [];
+                    dailyGroups[timeKey].push(pt.y);
+                });
+                const aggregatedData = [];
+                Object.keys(dailyGroups).forEach(timeKey => {
+                    const vals = dailyGroups[timeKey];
+                    const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
+                    let sd = 0;
+                    if (vals.length > 1) {
+                        const variance = vals.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / (vals.length - 1);
+                        sd = Math.sqrt(variance);
+                    }
+                    aggregatedData.push({ x: parseInt(timeKey), y: mean, sd: sd, count: vals.length });
+                });
+                aggregatedData.sort((a, b) => a.x - b.x);
+                lab[key].data = aggregatedData;
+            });
+            return lab;
         }
 
-        function renderGanttChart(data) {
-            if(activeCharts['gantt']) activeCharts['gantt'].destroy();
-            if(data.data.length>0) {
-                ganttChartContainer.classList.remove('hidden'); noGanttChartMessage.classList.add('hidden');
-                activeCharts['gantt'] = new Chart(ganttChartCanvas.getContext('2d'), { type:'bar', data:{ datasets:[{data:data.labels.map((l,i)=>({x:data.data[i],y:l})), backgroundColor:data.colors, borderRadius: 4, barPercentage:0.7}] }, options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{type:'time', time:{unit:'day'}}, y:{type:'category', ticks:{autoSkip:false}}} } });
-                ganttChartCanvas.style.height = `${data.labels.length*35+50}px`; activeCharts['gantt'].resize(); return 1;
-            } else { ganttChartContainer.classList.add('hidden'); noGanttChartMessage.classList.remove('hidden'); return 0; }
+        function parseMedDate(str) {
+            if (!str) return null;
+            const match = str.match(/(?:(\d{4})\/)?(\d{1,2})\/(\d{1,2})(?:\s+(上午|下午|AM|PM)?\s*(\d{1,2}):(\d{1,2}))?/i);
+            if (!match) return null;
+            
+            const y = match[1] ? parseInt(match[1]) : 2026;
+            const m = parseInt(match[2]) - 1;
+            const d = parseInt(match[3]);
+            const ampm = match[4];
+            let hour = match[5] ? parseInt(match[5]) : 0;
+            const min = match[6] ? parseInt(match[6]) : 0;
+            
+            if ((ampm === '下午' || (ampm && ampm.toUpperCase() === 'PM')) && hour < 12) hour += 12;
+            if ((ampm === '上午' || (ampm && ampm.toUpperCase() === 'AM')) && hour === 12) hour = 0;
+            
+            return new Date(y, m, d, hour, min);
+        }
+
+        function parseMed(text) {
+            const medsMap = {};
+            const colors = Object.values(CHART_COLORS);
+            const dateRegex = /(?:\d{4}\/)?\d{1,2}\/\d{1,2}(?:\s+(?:上午|下午|AM|PM)?\s*\d{1,2}:\d{1,2}(?::\d{1,2})?)?/gi;
+            
+            let globalMaxDate = new Date(0);
+            const lines = text.split('\n').filter(l => l.trim() && !l.includes('處方') && !l.includes('開始時間'));
+            
+            lines.forEach(l => {
+                const found = l.match(dateRegex);
+                if (found) {
+                    found.forEach(dStr => {
+                        const d = parseMedDate(dStr);
+                        if (d && d > globalMaxDate) globalMaxDate = d;
+                    });
+                }
+            });
+            if (globalMaxDate.getTime() === 0) globalMaxDate = new Date();
+
+            let cIdx = 0;
+            lines.forEach(l => {
+                const datesFound = l.match(dateRegex);
+                if (datesFound) {
+                    const firstDateIdx = l.search(dateRegex);
+                    const beforeDateStr = l.substring(0, firstDateIdx).trim();
+                    
+                    const cols = beforeDateStr.split(/\s{2,}/); 
+                    let drugName = cols[0].trim();
+                    let dosageDisplay = cols.slice(1).join(' ').trim();
+                    
+                    const isStat = beforeDateStr.toUpperCase().includes('STAT');
+                    
+                    const start = parseMedDate(datesFound[0]);
+                    const end = isStat ? new Date(start.getTime() + 1000) : (datesFound.length > 1 ? parseMedDate(datesFound[1]) : new Date(Math.max(globalMaxDate.getTime(), start.getTime() + 86400000)));
+
+                    if (start && end) {
+                        if (!medsMap[drugName]) {
+                            medsMap[drugName] = { segments: [], color: colors[cIdx++ % colors.length] };
+                        }
+                        medsMap[drugName].segments.push({ 
+                            start: start.getTime(), 
+                            end: end.getTime(), 
+                            dosage: dosageDisplay,
+                            isStat: isStat 
+                        });
+                    }
+                }
+            });
+            return medsMap;
+        }
+
+        const drawErrorBarsPlugin = {
+            id: 'errorBars',
+            afterDatasetsDraw(chart) {
+                const ctx = chart.ctx;
+                chart.data.datasets.forEach((dataset, i) => {
+                    const meta = chart.getDatasetMeta(i);
+                    if (!meta.hidden && dataset.data && meta.yAxisID) {
+                        meta.data.forEach((element, index) => {
+                            const dataPoint = dataset.data[index];
+                            if (dataPoint && dataPoint.sd && dataPoint.sd > 0) {
+                                const yAxis = chart.scales[meta.yAxisID];
+                                const x = element.x;
+                                const yTop = yAxis.getPixelForValue(dataPoint.y + dataPoint.sd);
+                                const yBottom = yAxis.getPixelForValue(dataPoint.y - dataPoint.sd);
+                                ctx.save();
+                                ctx.beginPath();
+                                ctx.moveTo(x, yTop); ctx.lineTo(x, yBottom);
+                                ctx.moveTo(x - 4, yTop); ctx.lineTo(x + 4, yTop);
+                                ctx.moveTo(x - 4, yBottom); ctx.lineTo(x + 4, yBottom);
+                                ctx.strokeStyle = dataset.borderColor;
+                                ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore();
+                            }
+                        });
+                    }
+                });
+            }
+        };
+
+        function createLabChart(title, keys, labData, groupConfig, container) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'chart-wrapper';
+            const canvasId = `chart_${Math.random().toString(36).substr(2, 9)}`;
+            wrapper.innerHTML = `<div class="chart-toolbar"><h3 class="chart-title">${title}</h3><button class="chart-btn" onclick="downloadChart('${canvasId}', '${title}.png')">📥 下載</button></div><canvas id="${canvasId}" style="max-height:250px;"></canvas>`;
+            container.appendChild(wrapper);
+            
+            const datasets = keys.map((k, i) => ({
+                label: labData[k].label,
+                data: labData[k].data,
+                borderColor: groupConfig.colors[i % groupConfig.colors.length],
+                backgroundColor: groupConfig.colors[i % groupConfig.colors.length],
+                yAxisID: (groupConfig.type === 'dual' && groupConfig.rightKeys?.some(rk => k.includes(rk))) ? 'y1' : 'y',
+                tension: 0.3, pointRadius: 4
+            }));
+
+            activeCharts.push(new Chart(document.getElementById(canvasId).getContext('2d'), {
+                type: 'line', data: { datasets }, plugins: [drawErrorBarsPlugin],
+                options: {
+                    scales: {
+                        x: { type: 'time', time: { unit: 'day', displayFormats: { day: 'MM/dd' } } },
+                        y: { position: 'left' },
+                        ...(groupConfig.type === 'dual' ? { y1: { position: 'right', grid: { drawOnChartArea: false } } } : {})
+                    }
+                }
+            }));
+        }
+
+        function createGanttChart(medsMap, container) {
+            const labels = Object.keys(medsMap);
+            const wrapper = document.createElement('div');
+            wrapper.className = 'chart-wrapper';
+            const canvasId = `chart_gantt_${Math.random().toString(36).substr(2, 9)}`;
+            const chartHeight = (labels.length * 45) + 60;
+            wrapper.innerHTML = `<div class="chart-toolbar"><h3 class="chart-title">用藥甘特圖 (● 圓點代表 STAT 處方)</h3><button class="chart-btn" onclick="downloadChart('${canvasId}', 'gantt.png')">📥 下載</button></div><div class="gantt-scroll-container"><canvas id="${canvasId}" style="height: ${chartHeight}px; width: 100%;"></canvas></div>`;
+            container.appendChild(wrapper);
+
+            const allData = []; const colors = [];
+            let minD = Infinity, maxD = -Infinity;
+            labels.forEach(name => {
+                medsMap[name].segments.forEach(seg => {
+                    allData.push({ x: [seg.start, seg.end], y: name, dosage: seg.dosage, isStat: seg.isStat });
+                    colors.push(medsMap[name].color);
+                    if(seg.start < minD) minD = seg.start; if(seg.end > maxD) maxD = seg.end;
+                });
+            });
+
+            activeCharts.push(new Chart(document.getElementById(canvasId).getContext('2d'), {
+                type: 'bar', data: { labels, datasets: [{ data: allData, backgroundColor: colors, borderRadius: 4, barPercentage: 0.8 }] },
+                plugins: [{
+                    id: 'drawCustomMarkers',
+                    afterDatasetsDraw(chart) {
+                        const ctx = chart.ctx;
+                        chart.getDatasetMeta(0).data.forEach((bar, i) => {
+                            const dataObj = chart.data.datasets[0].data[i];
+                            const left = Math.min(bar.base, bar.x);
+                            
+                            if (dataObj.isStat) {
+                                ctx.save();
+                                ctx.fillStyle = 'white';
+                                ctx.fillRect(left - 2, bar.y - bar.height/2, 5, bar.height);
+                                ctx.beginPath();
+                                ctx.arc(left, bar.y, 6, 0, Math.PI * 2);
+                                ctx.fillStyle = chart.data.datasets[0].backgroundColor[i];
+                                ctx.fill();
+                                ctx.restore();
+                            } else {
+                                ctx.save();
+                                ctx.fillStyle = 'white';
+                                ctx.font = 'bold 12px Inter';
+                                ctx.textAlign = 'left';
+                                const width = Math.abs(bar.base - bar.x);
+                                ctx.beginPath(); ctx.rect(left, bar.y - bar.height/2, width, bar.height); ctx.clip();
+                                ctx.fillText(dataObj.dosage, left + 6, bar.y + 1);
+                                ctx.restore();
+                            }
+                        });
+                    }
+                }],
+                options: {
+                    indexAxis: 'y', maintainAspectRatio: false, plugins: { legend: { display: false } },
+                    scales: {
+                        x: { type: 'time', min: minD - 86400000, max: maxD + 86400000, time: { unit: 'day', displayFormats: { day: 'MM/dd' } } },
+                        y: { ticks: { font: { weight: 'bold' } } }
+                    }
+                }
+            }));
+        }
+
+        function destroyActiveCharts() { 
+            activeCharts.forEach(c => c && c.destroy()); 
+            activeCharts = []; 
+            labChartsGoHere.innerHTML = ''; 
+            ganttChartGoHere.innerHTML = '';
         }
 
         function parseAndRenderCharts(labTxt, medTxt) {
             destroyActiveCharts();
             if(!labTxt.trim() && !medTxt.trim()) { chartsContainer.classList.add('hidden'); return; }
-            try {
-                const lc = renderLabCharts(parseLabDataForChart(labTxt)), gc = renderGanttChart(parseMedDataForGantt(medTxt));
-                if(lc>0 || gc>0) chartsContainer.classList.remove('hidden');
-                else chartsContainer.classList.add('hidden');
-            } catch(e) {}
+            chartsContainer.classList.remove('hidden');
+
+            if(labTxt.trim()) {
+                try {
+                    const labData = parseLab(labTxt);
+                    const processed = new Set();
+                    let labCount = 0;
+                    LAB_GROUPS.forEach(g => {
+                        const keys = Object.keys(labData).filter(k => g.keys.some(gk => k.includes(gk)) && labData[k].data.length > 0 && !processed.has(k));
+                        if(keys.length > 0) { 
+                            keys.forEach(k => processed.add(k)); 
+                            createLabChart(g.name, keys, labData, g, labChartsGoHere);
+                            labCount++;
+                        }
+                    });
+                    if (labCount > 0) {
+                        labChartsContainer.classList.remove('hidden');
+                        noLabChartMessage.classList.add('hidden');
+                    } else {
+                        labChartsContainer.classList.add('hidden');
+                        noLabChartMessage.classList.remove('hidden');
+                    }
+                } catch(e) { console.error("Lab Chart Error", e); }
+            } else {
+                labChartsContainer.classList.add('hidden');
+            }
+
+            if(medTxt.trim()) {
+                try {
+                    const medsMap = parseMed(medTxt);
+                    if (Object.keys(medsMap).length > 0) {
+                        createGanttChart(medsMap, ganttChartGoHere);
+                        ganttChartContainer.classList.remove('hidden');
+                        noGanttChartMessage.classList.add('hidden');
+                    } else {
+                        ganttChartContainer.classList.add('hidden');
+                        noGanttChartMessage.classList.remove('hidden');
+                    }
+                } catch(e) { console.error("Med Chart Error", e); }
+            } else {
+                ganttChartContainer.classList.add('hidden');
+            }
         }
 
         let chartTimer;
-        const debounceRender = () => { clearTimeout(chartTimer); chartTimer=setTimeout(()=>parseAndRenderCharts(labDataInput.value, medDataInput.value), 500); };
+        const debounceRender = () => { clearTimeout(chartTimer); chartTimer=setTimeout(()=>parseAndRenderCharts(labDataInput.value, medDataInput.value), 600); };
         labDataInput.addEventListener('input', debounceRender); medDataInput.addEventListener('input', debounceRender);
 
         // === AI 呼叫邏輯 ===
