@@ -7,7 +7,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/Almightyhao/SOAP-writter/main/S__18006027.png">
     <link rel="shortcut icon" href="favicon.ico">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>智能藥師 SOAP小幫手 (v22.0) - Pro Edition</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -40,6 +40,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            white-space: nowrap; /* 確保手機版不會折行 */
         }
         .nav-button:hover { color: #1d4ed8; background-color: #f1f5f9; }
         .nav-button.active { color: #1d4ed8; background-color: #eff6ff; font-weight: 600; }
@@ -47,6 +48,10 @@
             content: ''; position: absolute; bottom: -12px; left: 10%; width: 80%; height: 3px;
             background-color: #2563eb; border-radius: 3px 3px 0 0;
         }
+
+        /* 隱藏原生捲軸但保留滾動功能 (針對手機版選單與圖表) */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
         /* README 內容樣式優化 */
         .prose-readme { font-size: 0.95rem; line-height: 1.7; color: #334155; }
@@ -62,11 +67,13 @@
         .progress-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #3b82f6, #10b981); border-radius: 9999px; animation: indeterminate-progress 1.5s ease-in-out infinite; }
         @keyframes indeterminate-progress { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 
-        /* 全域滾動條美化 */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; }
+        /* 全域滾動條美化 (電腦版) */
+        @media (min-width: 768px) {
+            ::-webkit-scrollbar { width: 6px; height: 6px; }
+            ::-webkit-scrollbar-track { background: transparent; }
+            ::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+            ::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; }
+        }
 
         /* 卡片懸浮效果 */
         .glass-card {
@@ -84,10 +91,10 @@
 
         /* 製圖工具新增樣式 */
         .chart-wrapper { position: relative; margin-bottom: 1.5rem; border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 1rem; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-        .gantt-scroll-container { width: 100%; overflow-x: auto; overflow-y: auto; max-height: 500px; }
+        .gantt-scroll-container { width: 100%; overflow-x: auto; overflow-y: hidden; }
         .chart-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 0.5rem; }
         .chart-title { font-size: 0.875rem; font-weight: 700; color: #334155; margin-right: auto; }
-        .chart-btn { font-size: 0.75rem; padding: 0.3rem 0.6rem; background: #f1f5f9; color: #475569; border-radius: 0.375rem; cursor: pointer; transition: all 0.2s; font-weight: 600; border: 1px solid #e2e8f0; }
+        .chart-btn { font-size: 0.75rem; padding: 0.3rem 0.6rem; background: #f1f5f9; color: #475569; border-radius: 0.375rem; cursor: pointer; transition: all 0.2s; font-weight: 600; border: 1px solid #e2e8f0; white-space: nowrap; }
         .chart-btn:hover { background: #e2e8f0; color: #0f172a; }
     </style>
 </head>
@@ -95,7 +102,8 @@
 
     <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/80 shadow-sm">
         <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
+            <!-- 修正：手機版改為上下排列且選單可橫向滑動 -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between py-3 md:py-0 md:h-16 gap-3 md:gap-0">
                 <div class="flex items-center gap-3">
                     <img src="https://raw.githubusercontent.com/Almightyhao/SOAP-writter/main/S__18006027.png" alt="Logo" class="w-9 h-9 rounded-xl shadow-sm object-cover border border-slate-100">
                     <div class="flex flex-col">
@@ -104,20 +112,20 @@
                     </div>
                 </div>
                 
-                <div class="hidden md:flex items-center gap-1">
-                    <button id="nav-home" class="nav-button active">
+                <div class="flex items-center gap-1 overflow-x-auto scrollbar-hide w-full md:w-auto pb-1 md:pb-0">
+                    <button id="nav-home" class="nav-button active shrink-0">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                         主控台
                     </button>
-                    <button id="nav-soap-note" class="nav-button">
+                    <button id="nav-soap-note" class="nav-button shrink-0">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                         SOAP 筆記
                     </button>
-                    <button id="nav-calculator" class="nav-button">
+                    <button id="nav-calculator" class="nav-button shrink-0">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="16" y2="14.01"></line><line x1="12" y1="14" x2="12" y2="14.01"></line><line x1="8" y1="14" x2="8" y2="14.01"></line><line x1="16" y1="18" x2="16" y2="18.01"></line><line x1="12" y1="18" x2="12" y2="18.01"></line><line x1="8" y1="18" x2="8" y2="18.01"></line></svg>
                         計算機
                     </button>
-                    <button id="nav-settings" class="nav-button">
+                    <button id="nav-settings" class="nav-button shrink-0">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                         設定
                     </button>
@@ -129,7 +137,6 @@
     <div class="container mx-auto max-w-7xl p-4 sm:p-6 lg:p-8 mt-2">
         <main>
             <div id="view-home" class="view" style="display: block;">
-                
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div class="glass-card p-6 rounded-2xl flex items-center justify-between">
                         <div>
@@ -156,16 +163,16 @@
 
                 <div class="glass-card p-6 rounded-2xl mb-8">
                     <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                        <h2 class="text-base font-bold tracking-widest uppercase text-slate-700 flex items-center gap-2">
+                        <h2 class="text-base font-bold tracking-widest uppercase text-slate-700 flex items-center gap-2 w-full md:w-auto">
                             <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                             最近的專案
                         </h2>
-                        <div class="flex w-full md:w-auto gap-3">
+                        <div class="flex flex-col sm:flex-row w-full md:w-auto gap-3">
                             <div class="relative flex-1 md:w-64">
                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">🔍</span>
                                 <input type="text" id="searchInput" placeholder="搜尋專案..." class="w-full text-sm pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none">
                             </div>
-                            <button id="newProjectButton" class="bg-blue-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-blue-700 shadow-sm hover:shadow transition flex items-center whitespace-nowrap gap-2">
+                            <button id="newProjectButton" class="bg-blue-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-blue-700 shadow-sm hover:shadow transition flex items-center justify-center whitespace-nowrap gap-2">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                                 新增專案
                             </button>
@@ -183,8 +190,8 @@
                         快速入門與版本資訊
                     </h2>
                     
-                    <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-5 mb-5 text-sm text-blue-900 flex items-start gap-3">
-                        <div class="mt-0.5 text-blue-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div>
+                    <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-4 sm:p-5 mb-5 text-sm text-blue-900 flex items-start gap-3">
+                        <div class="mt-0.5 text-blue-500 shrink-0"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div>
                         <div>
                             <p class="font-bold mb-1 text-base">首次使用指南</p>
                             <p class="leading-relaxed text-blue-800/80">請先前往 <strong>設定</strong> 頁面輸入 API 金鑰，然後點擊「新增專案」即可開始。AI 會自動為您分析病歷、繪製趨勢圖並查核健保規範。</p>
@@ -196,32 +203,32 @@
                             <svg class="w-4 h-4 transition-transform group-open:rotate-90 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                             查看完整 GitHub 說明文件
                         </summary>
-                        <div id="readme-version-info-container" class="prose-readme mt-4 p-4 bg-white border border-slate-100 rounded-xl">
-                            <div class="flex justify-center py-4"><div class="spinner border-4 border-blue-200 border-t-blue-600 rounded-full w-6 h-6"></div></div>
+                        <div id="readme-version-info-container" class="prose-readme mt-4 p-3 sm:p-4 bg-white border border-slate-100 rounded-xl overflow-x-auto">
+                            <div class="flex justify-center py-4"><div class="spinner border-4 border-blue-200 border-t-blue-600 rounded-full w-6 h-6 animate-spin"></div></div>
                         </div>
                     </details>
                 </div>
             </div>
 
             <div id="view-soap-note" class="view">
-                
-                <div class="glass-card p-3 rounded-2xl mb-6 flex flex-wrap items-center justify-between gap-4 sticky top-20 z-30">
-                    <div class="flex items-center gap-2 flex-1 min-w-[250px]">
+                <!-- 修正：手機版改為相對定位，避免頂部遮擋，並優化按鈕排版 -->
+                <div class="glass-card p-3 rounded-2xl mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 md:sticky md:top-20 z-30">
+                    <div class="flex items-center gap-2 w-full md:w-auto md:flex-1">
                         <div class="w-8 h-8 rounded bg-blue-100 text-blue-600 flex items-center justify-center shrink-0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></div>
-                        <input type="text" id="projectNameInput" class="flex-1 text-lg font-bold text-slate-800 bg-transparent border-b-2 border-transparent hover:border-slate-300 focus:border-blue-500 px-2 py-1 transition-colors outline-none" placeholder="請輸入專案名稱...">
+                        <input type="text" id="projectNameInput" class="flex-1 text-lg font-bold text-slate-800 bg-transparent border-b-2 border-transparent hover:border-slate-300 focus:border-blue-500 px-2 py-1 transition-colors outline-none w-full" placeholder="請輸入專案名稱...">
                     </div>
-                    <div class="flex gap-2">
-                        <button id="saveProjectButton" class="text-sm font-medium text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 hover:text-blue-600 px-4 py-2 rounded-lg shadow-sm transition-all flex items-center gap-1.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg> 儲存</button>
-                        <button id="saveAsProjectButton" class="text-sm font-medium text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 hover:text-emerald-600 px-4 py-2 rounded-lg shadow-sm transition-all hidden md:block">另存新檔</button>
-                        <button id="deleteProjectButton" class="text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 border border-red-100 px-4 py-2 rounded-lg transition-all hidden md:block">刪除</button>
+                    <div class="flex flex-wrap gap-2 w-full md:w-auto">
+                        <button id="saveProjectButton" class="flex-1 md:flex-none justify-center text-sm font-medium text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 hover:text-blue-600 px-3 py-2 rounded-lg shadow-sm transition-all flex items-center gap-1.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg> 儲存</button>
+                        <button id="saveAsProjectButton" class="flex-1 md:flex-none justify-center text-sm font-medium text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 hover:text-emerald-600 px-3 py-2 rounded-lg shadow-sm transition-all">另存</button>
+                        <button id="deleteProjectButton" class="flex-1 md:flex-none justify-center text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 border border-red-100 px-3 py-2 rounded-lg transition-all">刪除</button>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
                     
                     <div class="lg:col-span-5 space-y-6">
                         
-                        <div class="glass-card p-5 rounded-2xl relative overflow-hidden">
+                        <div class="glass-card p-4 sm:p-5 rounded-2xl relative overflow-hidden">
                             <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
                             <div class="flex items-center justify-between mb-4">
                                 <h3 class="font-bold text-slate-800 flex items-center gap-2">
@@ -257,14 +264,14 @@
                                 <div>
                                     <label class="flex justify-between items-end mb-1.5">
                                         <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">病患資訊</span>
-                                        <span class="text-[10px] text-slate-400">例: Age: 70, Sex: M, SCr: 1.2...</span>
+                                        <span class="text-[10px] text-slate-400">例: Age: 70, Sex: M...</span>
                                     </label>
                                     <textarea id="patientInfo" rows="7" class="input-base resize-y" placeholder="請貼入去識別化後的病患主訴、病史等資訊..."></textarea>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="glass-card p-5 rounded-2xl relative overflow-hidden">
+                        <div class="glass-card p-4 sm:p-5 rounded-2xl relative overflow-hidden">
                             <div class="absolute top-0 left-0 w-1 h-full bg-teal-500"></div>
                             <div class="flex items-center gap-2 mb-4">
                                 <span class="w-6 h-6 rounded bg-teal-100 text-teal-700 text-xs font-bold flex items-center justify-center">2</span>
@@ -283,7 +290,7 @@
                             </div>
                         </div>
 
-                        <div class="glass-card p-5 rounded-2xl relative overflow-hidden">
+                        <div class="glass-card p-4 sm:p-5 rounded-2xl relative overflow-hidden">
                             <div class="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
                             <div class="flex items-center gap-2 mb-4">
                                 <span class="w-6 h-6 rounded bg-indigo-100 text-indigo-700 text-xs font-bold flex items-center justify-center">3</span>
@@ -291,10 +298,10 @@
                             </div>
                             
                             <div class="flex flex-wrap gap-2 mb-3 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
-                                <button class="ref-tab active flex-1 px-3 py-1.5 text-xs font-bold rounded-lg bg-white text-blue-600 shadow-sm transition-all" data-target="uptodateInfo">UpToDate</button>
-                                <button class="ref-tab flex-1 px-3 py-1.5 text-xs font-medium rounded-lg text-slate-500 hover:text-slate-700 transition-all" data-target="micromedexInfo">Micro</button>
-                                <button class="ref-tab flex-1 px-3 py-1.5 text-xs font-medium rounded-lg text-slate-500 hover:text-slate-700 transition-all" data-target="openevidenceInfo">OpenEv</button>
-                                <button class="ref-tab flex-1 px-3 py-1.5 text-xs font-medium rounded-lg text-slate-500 hover:text-slate-700 transition-all" data-target="nhiGuidelinesInfo">健保</button>
+                                <button class="ref-tab active flex-1 px-2 py-1.5 text-xs font-bold rounded-lg bg-white text-blue-600 shadow-sm transition-all" data-target="uptodateInfo">UpToDate</button>
+                                <button class="ref-tab flex-1 px-2 py-1.5 text-xs font-medium rounded-lg text-slate-500 hover:text-slate-700 transition-all" data-target="micromedexInfo">Micro</button>
+                                <button class="ref-tab flex-1 px-2 py-1.5 text-xs font-medium rounded-lg text-slate-500 hover:text-slate-700 transition-all" data-target="openevidenceInfo">OpenEv</button>
+                                <button class="ref-tab flex-1 px-2 py-1.5 text-xs font-medium rounded-lg text-slate-500 hover:text-slate-700 transition-all" data-target="nhiGuidelinesInfo">健保</button>
                             </div>
 
                             <textarea id="uptodateInfo" rows="4" class="ref-content input-base resize-y" placeholder="貼上 UpToDate 重點擷取..."></textarea>
@@ -303,11 +310,11 @@
                             <textarea id="nhiGuidelinesInfo" rows="4" class="ref-content hidden input-base resize-y" placeholder="貼上健保給付規範..."></textarea>
                         </div>
 
-                        <div class="glass-card p-5 rounded-2xl space-y-4">
+                        <div class="glass-card p-4 sm:p-5 rounded-2xl space-y-4">
                             <div>
                                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">AI 模型選擇</label>
                                 <select id="apiProviderSelect" class="input-base cursor-pointer">
-                                    <option value="gemini" selected>Google Gemini — 自動偵測 (推薦)</option>
+                                    <option value="gemini" selected>Google Gemini — 自動偵測</option>
                                     <option value="grok">Grok (xAI)</option>
                                 </select>
                             </div>
@@ -318,42 +325,43 @@
                         </div>
                     </div>
 
-                    <div class="lg:col-span-7 space-y-6 lg:sticky lg:top-20 h-auto lg:h-[calc(100vh-6rem)] overflow-y-auto pb-10 pr-1">
+                    <div class="lg:col-span-7 space-y-6 lg:sticky lg:top-20 h-auto lg:h-[calc(100vh-6rem)] overflow-y-auto pb-10 scrollbar-hide md:pr-1">
                         
-                        <div class="glass-card p-5 rounded-2xl border-l-4 border-l-emerald-500">
+                        <div class="glass-card p-4 sm:p-5 rounded-2xl border-l-4 border-l-emerald-500">
                             <h3 class="font-bold text-slate-800 text-sm mb-4 flex items-center gap-2">
                                 <span class="bg-emerald-100 text-emerald-600 p-1 rounded-md"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></span>
                                 自動解析數據面板
                             </h3>
                             <div id="autoCalcDisplay" class="hidden">
-                                <ul id="autoCalcList" class="grid grid-cols-2 gap-3 text-sm">
+                                <ul id="autoCalcList" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                                 </ul>
                             </div>
                             <div id="autoCalcPlaceholder" class="text-sm text-slate-400 bg-slate-50 p-4 rounded-xl border border-dashed border-slate-200 text-center">填寫左側病患資料後，自動計算結果將顯示於此。</div>
                         </div>
 
-                        <div id="chartsContainer" class="hidden glass-card p-5 rounded-2xl border-l-4 border-l-blue-500">
+                        <!-- 圖表區容器整合 v22.7.6 (修正手機版顯示) -->
+                        <div id="chartsContainer" class="hidden glass-card p-4 sm:p-5 rounded-2xl border-l-4 border-l-blue-500 w-full overflow-hidden">
                             <h3 class="font-bold text-slate-800 text-sm mb-4 flex items-center gap-2">
                                 <span class="bg-blue-100 text-blue-600 p-1 rounded-md"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg></span>
-                                視覺化圖表
+                                視覺化圖表 <span class="text-xs font-normal text-slate-400">(過寬可左右滑動)</span>
                             </h3>
-                            <div id="labChartsContainer" class="mb-6">
-                                <div id="labChartsGoHere" class="space-y-4"></div>
+                            <div id="labChartsContainer" class="mb-6 w-full">
+                                <div id="labChartsGoHere" class="space-y-4 w-full"></div>
                                 <p id="noLabChartMessage" class="hidden text-xs text-slate-400">無可繪製的 Lab 數據</p>
                             </div>
-                            <div id="ganttChartContainer" class="mt-6 pt-4 border-t border-slate-100">
+                            <div id="ganttChartContainer" class="mt-6 pt-4 border-t border-slate-100 w-full">
                                 <div id="ganttChartGoHere" class="relative w-full"></div>
                                 <p id="noGanttChartMessage" class="hidden text-xs text-slate-400">無可繪製的用藥史</p>
                             </div>
                         </div>
 
-                        <div class="glass-card p-6 rounded-2xl flex flex-col h-full min-h-[500px] border-l-4 border-l-indigo-500">
+                        <div class="glass-card p-4 sm:p-6 rounded-2xl flex flex-col h-full min-h-[500px] border-l-4 border-l-indigo-500">
                             <div class="flex justify-between items-center mb-4">
                                 <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
                                     <span class="bg-indigo-100 text-indigo-600 p-1 rounded-md"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg></span>
-                                    AI 生成 SOAP 筆記
+                                    AI 生成結果
                                 </h3>
-                                <button id="copyButton" class="text-xs font-bold px-4 py-2 bg-slate-100 text-slate-700 border border-slate-200 rounded-lg hover:bg-slate-200 hover:text-indigo-700 transition-colors disabled:opacity-50 flex items-center gap-1.5" disabled>
+                                <button id="copyButton" class="text-xs font-bold px-3 py-2 bg-slate-100 text-slate-700 border border-slate-200 rounded-lg hover:bg-slate-200 hover:text-indigo-700 transition-colors disabled:opacity-50 flex items-center gap-1.5" disabled>
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                                     一鍵複製
                                 </button>
@@ -361,12 +369,12 @@
                             
                             <div id="progressBarContainer"><div class="progress-bar"></div></div>
                             
-                            <div id="placeholder" class="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-xl bg-slate-50/50 py-12">
+                            <div id="placeholder" class="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-xl bg-slate-50/50 py-12 px-4 text-center">
                                 <div class="w-16 h-16 mb-4 text-slate-300"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div>
                                 <p class="text-sm font-medium text-slate-400">完成左側設定並同意條款，點擊下方按鈕開始生成</p>
                             </div>
                             
-                            <div id="output" class="hidden prose prose-slate prose-sm max-w-none flex-1 pr-2 mt-2"></div>
+                            <div id="output" class="hidden prose prose-slate prose-sm sm:prose-base max-w-none flex-1 mt-2 overflow-x-auto"></div>
                             
                             <div id="sourcesContainer" class="hidden mt-6 pt-4 border-t border-slate-100 bg-slate-50 p-4 rounded-xl">
                                 <h4 id="sourcesTitle" class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> 引用指引來源</h4>
@@ -379,31 +387,32 @@
             </div>
 
             <div id="view-calculator" class="view max-w-4xl mx-auto">
-                <div class="glass-card p-6 md:p-8 rounded-2xl mb-8">
+                <div class="glass-card p-4 sm:p-6 md:p-8 rounded-2xl mb-8">
                     <div class="flex items-center gap-3 mb-6 border-b border-slate-100 pb-4">
                         <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="16" y2="14.01"></line><line x1="12" y1="14" x2="12" y2="14.01"></line><line x1="8" y1="14" x2="8" y2="14.01"></line><line x1="16" y1="18" x2="16" y2="18.01"></line><line x1="12" y1="18" x2="12" y2="18.01"></line><line x1="8" y1="18" x2="8" y2="18.01"></line></svg></div>
-                        <h2 class="text-xl font-bold text-slate-800">臨床計算機 (Clinical Calculators)</h2>
+                        <h2 class="text-xl font-bold text-slate-800">臨床計算機</h2>
                     </div>
                     
-                    <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-5 mb-8">
+                    <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-4 sm:p-5 mb-8">
                         <h3 class="text-sm font-bold text-blue-800 mb-4 flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg> 基本資料 (跨計算機連動)</h3>
-                        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                        <!-- 修正：手機版自適應網格 -->
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
                             <div><label class="block text-xs font-semibold text-blue-600 mb-1.5 uppercase tracking-wider">性別</label><select id="manual_calcSex" class="input-base bg-white border-blue-200 focus:border-blue-500"><option value="Male">男性</option><option value="Female">女性</option></select></div>
                             <div><label class="block text-xs font-semibold text-blue-600 mb-1.5 uppercase tracking-wider">年齡</label><input type="number" id="manual_calcAge" class="input-base bg-white border-blue-200 focus:border-blue-500 calc-trigger" placeholder="歲"></div>
-                            <div><label class="block text-xs font-semibold text-blue-600 mb-1.5 uppercase tracking-wider">體重 (kg)</label><input type="number" id="manual_calcWeight" class="input-base bg-white border-blue-200 focus:border-blue-500 calc-trigger" placeholder="kg"></div>
-                            <div><label class="block text-xs font-semibold text-blue-600 mb-1.5 uppercase tracking-wider">身高 (cm)</label><input type="number" id="manual_calcHeight" class="input-base bg-white border-blue-200 focus:border-blue-500 calc-trigger" placeholder="cm"></div>
-                            <div><label class="block text-xs font-semibold text-blue-600 mb-1.5 uppercase tracking-wider">SCr (mg/dL)</label><input type="number" id="manual_calcScr" class="input-base bg-white border-blue-200 focus:border-blue-500 calc-trigger" placeholder="mg/dL"></div>
+                            <div><label class="block text-xs font-semibold text-blue-600 mb-1.5 uppercase tracking-wider">體重</label><input type="number" id="manual_calcWeight" class="input-base bg-white border-blue-200 focus:border-blue-500 calc-trigger" placeholder="kg"></div>
+                            <div><label class="block text-xs font-semibold text-blue-600 mb-1.5 uppercase tracking-wider">身高</label><input type="number" id="manual_calcHeight" class="input-base bg-white border-blue-200 focus:border-blue-500 calc-trigger" placeholder="cm"></div>
+                            <div><label class="block text-xs font-semibold text-blue-600 mb-1.5 uppercase tracking-wider">SCr</label><input type="number" id="manual_calcScr" class="input-base bg-white border-blue-200 focus:border-blue-500 calc-trigger" placeholder="mg/dL"></div>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                         <div class="space-y-4">
                             <details class="group bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden" open>
                                 <summary class="p-4 bg-slate-50 font-bold text-sm text-slate-800 select-none flex justify-between items-center cursor-pointer hover:bg-slate-100 transition-colors">
                                     1. CrCl (C-G) & IBW/ABW
                                     <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </summary>
-                                <div class="p-5 border-t border-slate-200 bg-white space-y-3">
+                                <div class="p-4 sm:p-5 border-t border-slate-200 bg-white space-y-3">
                                     <div class="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-100"><span class="text-sm font-medium text-slate-500" id="manual_crclResult">CrCl: 待輸入</span></div>
                                     <div class="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-100"><span class="text-sm font-medium text-slate-500" id="manual_bwResult">IBW: 待輸入</span></div>
                                     <button id="manual_calculateCrClBwButton" class="hidden">Calc</button>
@@ -415,7 +424,7 @@
                                     2. eGFR (CKD-EPI 2021)
                                     <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </summary>
-                                <div class="p-5 border-t border-slate-200 bg-white">
+                                <div class="p-4 sm:p-5 border-t border-slate-200 bg-white">
                                     <div class="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-100"><span class="text-sm font-medium text-slate-500" id="manual_calcCkdEpiResult">eGFR: 待輸入</span></div>
                                     <button id="manual_calculateCkdEpiButton" class="hidden">Calc</button>
                                 </div>
@@ -426,7 +435,7 @@
                                     3. BSA (Mosteller)
                                     <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </summary>
-                                <div class="p-5 border-t border-slate-200 bg-white">
+                                <div class="p-4 sm:p-5 border-t border-slate-200 bg-white">
                                     <div class="flex justify-between items-center bg-slate-50 p-3 rounded-lg border border-slate-100"><span class="text-sm font-medium text-slate-500" id="manual_calcBsaResult">BSA: 待輸入</span></div>
                                     <button id="manual_calculateBsaButton" class="hidden">Calc</button>
                                 </div>
@@ -439,7 +448,7 @@
                                     4. CHA₂DS₂-VASc 風險評估
                                     <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </summary>
-                                <div class="p-5 border-t border-slate-200 bg-white text-sm">
+                                <div class="p-4 sm:p-5 border-t border-slate-200 bg-white text-sm">
                                     <div class="grid grid-cols-2 gap-4 mb-5">
                                         <fieldset><legend class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">年齡</legend>
                                             <div class="space-y-2">
@@ -455,7 +464,7 @@
                                             </div>
                                         </fieldset>
                                     </div>
-                                    <div class="grid grid-cols-2 gap-3 mb-5 border-t border-slate-100 pt-4">
+                                    <div class="grid grid-cols-2 sm:grid-cols-2 gap-3 mb-5 border-t border-slate-100 pt-4">
                                         <label class="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors"><input type="checkbox" id="manual_c2vChf" class="calc-trigger-c2v rounded text-blue-600 focus:ring-blue-500 w-4 h-4"> <span class="font-medium">CHF (+1)</span></label>
                                         <label class="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors"><input type="checkbox" id="manual_c2vHt" class="calc-trigger-c2v rounded text-blue-600 focus:ring-blue-500 w-4 h-4"> <span class="font-medium">高血壓 (+1)</span></label>
                                         <label class="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-colors"><input type="checkbox" id="manual_c2vDm" class="calc-trigger-c2v rounded text-blue-600 focus:ring-blue-500 w-4 h-4"> <span class="font-medium">糖尿病 (+1)</span></label>
@@ -472,12 +481,12 @@
                                     5. Child-Pugh Score
                                     <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </summary>
-                                <div class="p-5 border-t border-slate-200 bg-white text-sm space-y-4">
-                                    <div class="grid gap-2"><span class="text-xs font-bold text-slate-400 uppercase tracking-widest">腹水</span><div class="flex flex-wrap gap-4"><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpAscites" value="1" checked class="calc-trigger-cp"> <span class="font-medium">無 (1)</span></label><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpAscites" value="2" class="calc-trigger-cp"> <span class="font-medium">輕微 (2)</span></label><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpAscites" value="3" class="calc-trigger-cp"> <span class="font-medium">中/重 (3)</span></label></div></div>
-                                    <div class="grid gap-2"><span class="text-xs font-bold text-slate-400 uppercase tracking-widest">肝腦病變</span><div class="flex flex-wrap gap-4"><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpEnceph" value="1" checked class="calc-trigger-cp"> <span class="font-medium">無 (1)</span></label><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpEnceph" value="2" class="calc-trigger-cp"> <span class="font-medium">Gr1-2 (2)</span></label><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpEnceph" value="3" class="calc-trigger-cp"> <span class="font-medium">Gr3-4 (3)</span></label></div></div>
-                                    <div class="grid gap-2"><span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Bilirubin</span><div class="flex flex-wrap gap-4"><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpBili" value="1" checked class="calc-trigger-cp"> <span class="font-medium">&lt;2 (1)</span></label><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpBili" value="2" class="calc-trigger-cp"> <span class="font-medium">2-3 (2)</span></label><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpBili" value="3" class="calc-trigger-cp"> <span class="font-medium">&gt;3 (3)</span></label></div></div>
-                                    <div class="grid gap-2"><span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Albumin</span><div class="flex flex-wrap gap-4"><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpAlb" value="1" checked class="calc-trigger-cp"> <span class="font-medium">&gt;3.5 (1)</span></label><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpAlb" value="2" class="calc-trigger-cp"> <span class="font-medium">2.8-3.5 (2)</span></label><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpAlb" value="3" class="calc-trigger-cp"> <span class="font-medium">&lt;2.8 (3)</span></label></div></div>
-                                    <div class="grid gap-2"><span class="text-xs font-bold text-slate-400 uppercase tracking-widest">INR</span><div class="flex flex-wrap gap-4"><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpInr" value="1" checked class="calc-trigger-cp"> <span class="font-medium">&lt;1.7 (1)</span></label><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpInr" value="2" class="calc-trigger-cp"> <span class="font-medium">1.7-2.3 (2)</span></label><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpInr" value="3" class="calc-trigger-cp"> <span class="font-medium">&gt;2.3 (3)</span></label></div></div>
+                                <div class="p-4 sm:p-5 border-t border-slate-200 bg-white text-sm space-y-4">
+                                    <div class="grid gap-2"><span class="text-xs font-bold text-slate-400 uppercase tracking-widest">腹水</span><div class="flex flex-wrap gap-3 sm:gap-4"><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpAscites" value="1" checked class="calc-trigger-cp"> <span class="font-medium">無 (1)</span></label><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpAscites" value="2" class="calc-trigger-cp"> <span class="font-medium">輕微 (2)</span></label><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpAscites" value="3" class="calc-trigger-cp"> <span class="font-medium">中/重 (3)</span></label></div></div>
+                                    <div class="grid gap-2"><span class="text-xs font-bold text-slate-400 uppercase tracking-widest">肝腦病變</span><div class="flex flex-wrap gap-3 sm:gap-4"><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpEnceph" value="1" checked class="calc-trigger-cp"> <span class="font-medium">無 (1)</span></label><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpEnceph" value="2" class="calc-trigger-cp"> <span class="font-medium">Gr1-2 (2)</span></label><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpEnceph" value="3" class="calc-trigger-cp"> <span class="font-medium">Gr3-4 (3)</span></label></div></div>
+                                    <div class="grid gap-2"><span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Bilirubin</span><div class="flex flex-wrap gap-3 sm:gap-4"><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpBili" value="1" checked class="calc-trigger-cp"> <span class="font-medium">&lt;2 (1)</span></label><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpBili" value="2" class="calc-trigger-cp"> <span class="font-medium">2-3 (2)</span></label><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpBili" value="3" class="calc-trigger-cp"> <span class="font-medium">&gt;3 (3)</span></label></div></div>
+                                    <div class="grid gap-2"><span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Albumin</span><div class="flex flex-wrap gap-3 sm:gap-4"><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpAlb" value="1" checked class="calc-trigger-cp"> <span class="font-medium">&gt;3.5 (1)</span></label><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpAlb" value="2" class="calc-trigger-cp"> <span class="font-medium">2.8-3.5 (2)</span></label><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpAlb" value="3" class="calc-trigger-cp"> <span class="font-medium">&lt;2.8 (3)</span></label></div></div>
+                                    <div class="grid gap-2"><span class="text-xs font-bold text-slate-400 uppercase tracking-widest">INR</span><div class="flex flex-wrap gap-3 sm:gap-4"><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpInr" value="1" checked class="calc-trigger-cp"> <span class="font-medium">&lt;1.7 (1)</span></label><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpInr" value="2" class="calc-trigger-cp"> <span class="font-medium">1.7-2.3 (2)</span></label><label class="flex items-center gap-1.5 cursor-pointer hover:text-blue-600"><input type="radio" name="manual_cpInr" value="3" class="calc-trigger-cp"> <span class="font-medium">&gt;2.3 (3)</span></label></div></div>
                                     
                                     <div class="flex justify-between items-center bg-blue-50/50 border border-blue-100 p-3 rounded-lg mt-4"><span class="text-base font-bold text-blue-700" id="manual_calcChildPughResult">Grade: 待輸入</span></div>
                                     <button id="manual_calculateChildPughButton" class="hidden">Calc</button>
@@ -491,56 +500,56 @@
             <div id="view-settings" class="view max-w-3xl mx-auto">
                 <div class="mb-10">
                     <h2 class="text-sm font-bold tracking-widest uppercase text-slate-500 mb-4 flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg> API 金鑰管理</h2>
-                    <div class="glass-card p-6 rounded-2xl space-y-6">
+                    <div class="glass-card p-4 sm:p-6 rounded-2xl space-y-6">
                         <div class="flex flex-col md:flex-row md:items-center gap-4 border-b border-slate-100 pb-6">
-                            <div class="w-12 h-12 bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl flex items-center justify-center font-bold text-blue-600 text-xl shadow-inner">G</div>
+                            <div class="w-12 h-12 bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl flex items-center justify-center font-bold text-blue-600 text-xl shadow-inner shrink-0">G</div>
                             <div class="flex-1">
                                 <div class="font-bold text-base text-slate-800">Google Gemini</div>
                                 <div class="text-xs font-medium text-slate-500 flex items-center gap-1.5 mt-1" id="geminiApiStatus"><span class="w-2.5 h-2.5 rounded-full bg-slate-300 inline-block shadow-sm"></span> 尚未設定</div>
                             </div>
-                            <input type="password" id="geminiApiKeyInput" class="input-base md:w-64" placeholder="AIzaSy...">
+                            <input type="password" id="geminiApiKeyInput" class="input-base md:w-64 w-full" placeholder="AIzaSy...">
                         </div>
                         <div class="flex flex-col md:flex-row md:items-center gap-4">
-                            <div class="w-12 h-12 bg-slate-800 text-white rounded-xl flex items-center justify-center font-bold text-xl shadow-inner">X</div>
+                            <div class="w-12 h-12 bg-slate-800 text-white rounded-xl flex items-center justify-center font-bold text-xl shadow-inner shrink-0">X</div>
                             <div class="flex-1">
                                 <div class="font-bold text-base text-slate-800">Grok (xAI)</div>
                                 <div class="text-xs font-medium text-slate-500 flex items-center gap-1.5 mt-1" id="grokApiStatus"><span class="w-2.5 h-2.5 rounded-full bg-slate-300 inline-block shadow-sm"></span> 尚未設定</div>
                             </div>
-                            <input type="password" id="grokApiKeyInput" class="input-base md:w-64" placeholder="gk_...">
+                            <input type="password" id="grokApiKeyInput" class="input-base md:w-64 w-full" placeholder="gk_...">
                         </div>
-                        <div class="pt-4 flex justify-end border-t border-slate-100"><button id="saveSettingsButton" class="bg-blue-600 text-white text-sm font-bold px-6 py-2.5 rounded-xl hover:bg-blue-700 shadow-sm transition-all transform hover:-translate-y-0.5">儲存金鑰</button></div>
+                        <div class="pt-4 flex justify-end border-t border-slate-100"><button id="saveSettingsButton" class="bg-blue-600 text-white text-sm font-bold px-6 py-2.5 rounded-xl hover:bg-blue-700 shadow-sm transition-all transform hover:-translate-y-0.5 w-full sm:w-auto">儲存金鑰</button></div>
                     </div>
                 </div>
 
                 <div class="mb-10">
                     <h2 class="text-sm font-bold tracking-widest uppercase text-slate-500 mb-4 flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg> AI 模型偏好</h2>
-                    <div class="glass-card p-6 rounded-2xl">
+                    <div class="glass-card p-4 sm:p-6 rounded-2xl">
                         <div class="flex items-center justify-between">
                             <div>
                                 <div class="font-bold text-base text-slate-800">自動偵測最新模型</div>
                                 <div class="text-sm font-medium text-slate-500 mt-1">目前使用：<span id="settings-current-model" class="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">gemini-1.5-flash</span></div>
                             </div>
-                            <div class="w-10 h-5 bg-emerald-500 rounded-full relative shadow-inner"><div class="w-4 h-4 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm"></div></div>
+                            <div class="w-10 h-5 bg-emerald-500 rounded-full relative shadow-inner shrink-0"><div class="w-4 h-4 bg-white rounded-full absolute right-0.5 top-0.5 shadow-sm"></div></div>
                         </div>
                     </div>
                 </div>
 
                 <div>
                     <h2 class="text-sm font-bold tracking-widest uppercase text-slate-500 mb-4 flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg> 資料管理</h2>
-                    <div class="glass-card p-6 rounded-2xl space-y-6">
-                        <div class="flex items-center justify-between border-b border-slate-100 pb-6">
+                    <div class="glass-card p-4 sm:p-6 rounded-2xl space-y-6">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-6 gap-4">
                             <div>
                                 <div class="font-bold text-base text-slate-800">匯出所有專案</div>
                                 <div class="text-sm font-medium text-slate-500 mt-1">下載 JSON 備份檔案，以便在其他裝置使用</div>
                             </div>
-                            <button onclick="exportData()" class="border border-slate-300 text-slate-700 bg-white shadow-sm text-sm font-semibold px-4 py-2 rounded-lg hover:bg-slate-50 transition-colors">匯出資料</button>
+                            <button onclick="exportData()" class="border border-slate-300 text-slate-700 bg-white shadow-sm text-sm font-semibold px-4 py-2 rounded-lg hover:bg-slate-50 transition-colors w-full sm:w-auto">匯出資料</button>
                         </div>
-                        <div class="flex items-center justify-between">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <div>
                                 <div class="font-bold text-base text-red-600">清除所有本機資料</div>
                                 <div class="text-sm font-medium text-red-400 mt-1">包含所有專案、設定與金鑰，此操作無法復原</div>
                             </div>
-                            <button onclick="clearData()" class="border border-red-200 text-red-600 bg-red-50 text-sm font-bold px-4 py-2 rounded-lg hover:bg-red-100 transition-colors">永久清除</button>
+                            <button onclick="clearData()" class="border border-red-200 text-red-600 bg-red-50 text-sm font-bold px-4 py-2 rounded-lg hover:bg-red-100 transition-colors w-full sm:w-auto">永久清除</button>
                         </div>
                     </div>
                 </div>
@@ -548,8 +557,8 @@
         </main>
     </div>
 
-    <div id="errorModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center hidden z-[100] transition-opacity">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center transform transition-transform scale-95 border border-slate-200">
+    <div id="errorModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center hidden z-[100] transition-opacity p-4">
+        <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center transform transition-transform scale-95 border border-slate-200">
             <div class="w-16 h-16 bg-red-50 border-4 border-white shadow-sm text-red-500 rounded-full flex items-center justify-center mx-auto mb-4"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg></div>
             <h3 class="font-extrabold text-slate-800 text-xl mb-2">發生錯誤</h3>
             <p id="errorMessage" class="text-sm font-medium text-slate-500 mb-6"></p>
@@ -561,7 +570,7 @@
         // === 全域變數與設定 ===
         let appSettings = { apiKeys: { gemini: "", grok: "" }, projects: [] };
         let currentProjectId = null; 
-        let activeCharts = []; // 改為陣列以配合新版製圖邏輯
+        let activeCharts = []; 
 
         let geminiModelName = "gemini-1.5-flash"; 
         const geminiApiUrlBase = "https://generativelanguage.googleapis.com/v1beta/models/";
@@ -571,7 +580,7 @@
         const appStorageKey = 'smartPharmacistSettings_v21.2';
         const githubReadmeUrl = "https://api.github.com/repos/Almightyhao/SOAP-writter/readme";
 
-        // === 製圖常數設定 (新增) ===
+        // === 製圖常數設定 ===
         const CHART_COLORS = { orange: 'rgb(249, 115, 22)', blue: 'rgb(59, 130, 246)', purple: 'rgb(168, 85, 247)', red: 'rgb(239, 68, 68)', teal: 'rgb(20, 184, 166)', gray: 'rgb(107, 114, 128)' };
         const LAB_GROUPS = [
             { name: '肝功能 (Liver)', keys: ['AST', 'GOT', 'ALT', 'GPT', 'ALBUMIN', 'BILIRUBINTOTAL', 'BILIRUBIN', 'TBIL'], colors: [CHART_COLORS.orange, CHART_COLORS.red, CHART_COLORS.teal, CHART_COLORS.purple], type: 'dual', leftKeys: ['AST', 'GOT', 'ALT', 'GPT'], rightKeys: ['ALBUMIN', 'BILIRUBINTOTAL', 'BILIRUBIN', 'TBIL'] },
@@ -637,7 +646,7 @@
         const labChartsGoHere = document.getElementById('labChartsGoHere');
         const noLabChartMessage = document.getElementById('noLabChartMessage');
         const ganttChartContainer = document.getElementById('ganttChartContainer');
-        const ganttChartGoHere = document.getElementById('ganttChartGoHere'); // 更新綁定
+        const ganttChartGoHere = document.getElementById('ganttChartGoHere'); 
         const noGanttChartMessage = document.getElementById('noGanttChartMessage');
 
         const errorModal = document.getElementById('errorModal');
@@ -671,8 +680,7 @@
             });
             if (views[viewId]) {
                 views[viewId].style.display = 'block';
-                // Trigger reflow to restart animation
-                void views[viewId].offsetWidth;
+                void views[viewId].offsetWidth; // trigger reflow
                 views[viewId].classList.add('active');
             }
             
@@ -783,17 +791,17 @@
                 const specialty = project.data.specialtyFocus || '綜合評估';
                 
                 projectEl.innerHTML = `
-                    <div class="flex items-center gap-4 flex-1" onclick="loadProject('${project.id}')">
+                    <div class="flex items-center gap-4 flex-1 overflow-hidden" onclick="loadProject('${project.id}')">
                         <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0 border border-blue-100"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg></div>
-                        <div>
-                            <div class="text-sm font-bold text-slate-800 group-hover:text-blue-600 transition-colors">${project.name}</div>
-                            <div class="text-xs font-medium text-slate-500 mt-1 flex items-center gap-2">
-                                <span class="bg-slate-100 px-2 py-0.5 rounded text-slate-600">${specialty}</span>
-                                <span>更新於 ${lastUpdated}</span>
+                        <div class="min-w-0">
+                            <div class="text-sm font-bold text-slate-800 group-hover:text-blue-600 transition-colors truncate">${project.name}</div>
+                            <div class="text-xs font-medium text-slate-500 mt-1 flex flex-wrap items-center gap-2">
+                                <span class="bg-slate-100 px-2 py-0.5 rounded text-slate-600 truncate">${specialty}</span>
+                                <span class="truncate">更新於 ${lastUpdated}</span>
                             </div>
                         </div>
                     </div>
-                    <button onclick="deleteProject('${project.id}')" class="w-8 h-8 flex items-center justify-center rounded text-slate-400 hover:bg-red-50 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all">✕</button>
+                    <button onclick="event.stopPropagation(); deleteProject('${project.id}')" class="w-8 h-8 flex items-center justify-center rounded text-slate-400 hover:bg-red-50 hover:text-red-600 shrink-0 opacity-100 md:opacity-0 group-hover:opacity-100 transition-all">✕</button>
                 `;
                 projectListContainer.appendChild(projectEl);
             });
@@ -867,6 +875,7 @@
                 if (index !== -1) {
                     appSettings.projects[index].name = name; appSettings.projects[index].data = data; appSettings.projects[index].updatedAt = Date.now();
                     saveAppSettings(); alert("專案已儲存。");
+                    renderProjectList();
                 }
             } else saveAsNewProject(name, data);
         }
@@ -879,6 +888,7 @@
             appSettings.projects.push({ id: newId, name: pName, createdAt: Date.now(), updatedAt: Date.now(), data: pData });
             saveAppSettings(); currentProjectId = newId; projectNameInput.value = pName;
             alert(`已另存為 "${pName}"。`);
+            renderProjectList();
         }
 
         function deleteCurrentProject() {
@@ -1009,7 +1019,7 @@
             a.click(); 
         };
 
-        // === 製圖解析與渲染 (從 v22.7.6 移植) ===
+        // === 製圖解析與渲染 ===
         function parseChartDate(str) {
             if (!str) return null;
             const match = str.match(/(\d{1,2})\/(\d{1,2})(?:\s+(\d{1,2}):(\d{1,2}))?/);
@@ -1163,11 +1173,21 @@
             }
         };
 
+        // 修正：圖表加入最小寬度容器，過寬時可左右滑動
         function createLabChart(title, keys, labData, groupConfig, container) {
             const wrapper = document.createElement('div');
             wrapper.className = 'chart-wrapper';
             const canvasId = `chart_${Math.random().toString(36).substr(2, 9)}`;
-            wrapper.innerHTML = `<div class="chart-toolbar"><h3 class="chart-title">${title}</h3><button class="chart-btn" onclick="downloadChart('${canvasId}', '${title}.png')">📥 下載</button></div><canvas id="${canvasId}" style="max-height:250px;"></canvas>`;
+            wrapper.innerHTML = `
+                <div class="chart-toolbar flex-wrap gap-2">
+                    <h3 class="chart-title text-sm">${title}</h3>
+                    <button class="chart-btn" onclick="downloadChart('${canvasId}', '${title}.png')">📥 下載</button>
+                </div>
+                <div class="w-full overflow-x-auto scrollbar-hide">
+                    <div style="min-width: 450px;">
+                        <canvas id="${canvasId}" style="height: 250px; width: 100%;"></canvas>
+                    </div>
+                </div>`;
             container.appendChild(wrapper);
             
             const datasets = keys.map((k, i) => ({
@@ -1182,6 +1202,8 @@
             activeCharts.push(new Chart(document.getElementById(canvasId).getContext('2d'), {
                 type: 'line', data: { datasets }, plugins: [drawErrorBarsPlugin],
                 options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                     scales: {
                         x: { type: 'time', time: { unit: 'day', displayFormats: { day: 'MM/dd' } } },
                         y: { position: 'left' },
@@ -1191,13 +1213,23 @@
             }));
         }
 
+        // 修正：甘特圖加入最小寬度容器，過寬時可左右滑動
         function createGanttChart(medsMap, container) {
             const labels = Object.keys(medsMap);
             const wrapper = document.createElement('div');
             wrapper.className = 'chart-wrapper';
             const canvasId = `chart_gantt_${Math.random().toString(36).substr(2, 9)}`;
             const chartHeight = (labels.length * 45) + 60;
-            wrapper.innerHTML = `<div class="chart-toolbar"><h3 class="chart-title">用藥甘特圖 (● 圓點代表 STAT 處方)</h3><button class="chart-btn" onclick="downloadChart('${canvasId}', 'gantt.png')">📥 下載</button></div><div class="gantt-scroll-container"><canvas id="${canvasId}" style="height: ${chartHeight}px; width: 100%;"></canvas></div>`;
+            wrapper.innerHTML = `
+                <div class="chart-toolbar flex-wrap gap-2">
+                    <h3 class="chart-title text-sm">用藥甘特圖 (● 代表 STAT)</h3>
+                    <button class="chart-btn" onclick="downloadChart('${canvasId}', 'gantt.png')">📥 下載</button>
+                </div>
+                <div class="gantt-scroll-container scrollbar-hide w-full overflow-x-auto">
+                    <div style="min-width: 550px;">
+                        <canvas id="${canvasId}" style="height: ${chartHeight}px; width: 100%;"></canvas>
+                    </div>
+                </div>`;
             container.appendChild(wrapper);
 
             const allData = []; const colors = [];
@@ -1243,7 +1275,7 @@
                     }
                 }],
                 options: {
-                    indexAxis: 'y', maintainAspectRatio: false, plugins: { legend: { display: false } },
+                    indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
                     scales: {
                         x: { type: 'time', min: minD - 86400000, max: maxD + 86400000, time: { unit: 'day', displayFormats: { day: 'MM/dd' } } },
                         y: { ticks: { font: { weight: 'bold' } } }
@@ -1370,6 +1402,27 @@
                 }
             } catch(e) { showError(e.message); }
             finally { progressBarContainer.style.display='none'; placeholderDiv.classList.remove('animate-pulse'); generateButton.disabled=false; generateButton.classList.remove('opacity-50'); }
+        });
+
+        // 取代原本的複製寫法，使用純原生 Clipboard API 提升手機相容性
+        copyButton.addEventListener('click', async () => {
+            try {
+                const htmlContent = document.getElementById('output').innerHTML;
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = htmlContent;
+                const textContent = tempDiv.textContent || tempDiv.innerText || '';
+                
+                await navigator.clipboard.writeText(textContent);
+                const originalText = copyButton.innerHTML;
+                copyButton.innerHTML = '✅ 已複製';
+                copyButton.classList.replace('text-slate-700', 'text-emerald-600');
+                setTimeout(() => {
+                    copyButton.innerHTML = originalText;
+                    copyButton.classList.replace('text-emerald-600', 'text-slate-700');
+                }, 2000);
+            } catch (err) {
+                showError("複製失敗，請手動框選複製。");
+            }
         });
 
         // === 啟動初始化 ===
