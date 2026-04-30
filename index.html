@@ -40,7 +40,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            white-space: nowrap; /* 確保手機版不會折行 */
+            white-space: nowrap; 
         }
         .nav-button:hover { color: #1d4ed8; background-color: #f1f5f9; }
         .nav-button.active { color: #1d4ed8; background-color: #eff6ff; font-weight: 600; }
@@ -49,7 +49,7 @@
             background-color: #2563eb; border-radius: 3px 3px 0 0;
         }
 
-        /* 隱藏原生捲軸但保留滾動功能 (針對手機版選單與圖表) */
+        /* 隱藏原生捲軸但保留滾動功能 */
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -66,6 +66,10 @@
         #progressBarContainer { display: none; width: 100%; background-color: #e2e8f0; border-radius: 9999px; overflow: hidden; margin-bottom: 1rem; height: 6px; }
         .progress-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #3b82f6, #10b981); border-radius: 9999px; animation: indeterminate-progress 1.5s ease-in-out infinite; }
         @keyframes indeterminate-progress { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+        /* 旋轉動畫 */
+        .spinner { border-top-color: transparent; width: 1rem; height: 1rem; animation: spin 1s linear infinite; border-radius: 50%; border: 2px solid currentColor; border-top-color: transparent; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         /* 全域滾動條美化 (電腦版) */
         @media (min-width: 768px) {
@@ -308,10 +312,27 @@
                             <textarea id="nhiGuidelinesInfo" rows="4" class="ref-content hidden input-base resize-y" placeholder="貼上健保給付規範..."></textarea>
                         </div>
 
+                        <!-- 💡 新增：AI 指引即時查詢卡片 -->
+                        <div class="glass-card p-4 sm:p-5 rounded-2xl relative overflow-hidden">
+                            <div class="absolute top-0 left-0 w-1 h-full bg-amber-400"></div>
+                            <div class="flex items-center justify-between">
+                                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                                    <span class="bg-amber-100 text-amber-600 p-1 rounded-md">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                                    </span>
+                                    AI 指引即時查詢
+                                </h3>
+                                <button id="queryGuidelinesButton" class="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1.5 rounded-lg hover:bg-amber-100 font-bold transition-colors">立即查詢</button>
+                            </div>
+                            <div id="guidelineListContainer" class="hidden mt-3">
+                                <ul id="guidelineList" class="text-xs text-slate-600 space-y-1.5 bg-amber-50/50 p-3 rounded-xl border border-amber-100"></ul>
+                            </div>
+                        </div>
+
                         <div class="glass-card p-4 sm:p-5 rounded-2xl space-y-4">
                             <div>
                                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">AI 模型選擇</label>
-                                <select id="apiProviderSelect" class="input-base cursor-pointer">
+                                <select id="apiProviderSelect" class="input-base cursor-pointer font-medium">
                                     <option value="gemini" selected>Google Gemini — 自動偵測 (推薦)</option>
                                     <option value="grok">Grok (xAI)</option>
                                 </select>
@@ -360,7 +381,7 @@
                                     AI 生成結果
                                 </h3>
                                 <button id="copyButton" class="text-xs font-bold px-3 py-2 bg-slate-100 text-slate-700 border border-slate-200 rounded-lg hover:bg-slate-200 hover:text-indigo-700 transition-colors disabled:opacity-50 flex items-center gap-1.5" disabled>
-                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                                     一鍵複製
                                 </button>
                             </div>
@@ -624,6 +645,11 @@
         const apiProviderSelect = document.getElementById('apiProviderSelect');
         const labDataInput = document.getElementById('labDataInput');
         const medDataInput = document.getElementById('medDataInput');
+
+        // 🟢 新增：AI 指引即時查詢 DOM
+        const queryGuidelinesButton = document.getElementById('queryGuidelinesButton');
+        const guidelineListContainer = document.getElementById('guidelineListContainer');
+        const guidelineList = document.getElementById('guidelineList');
 
         const outputDiv = document.getElementById('output');
         const placeholderDiv = document.getElementById('placeholder');
@@ -1337,21 +1363,18 @@
         const debounceRender = () => { clearTimeout(chartTimer); chartTimer=setTimeout(()=>parseAndRenderCharts(labDataInput.value, medDataInput.value), 600); };
         labDataInput.addEventListener('input', debounceRender); medDataInput.addEventListener('input', debounceRender);
 
-        // === 新增：動態向 Google 獲取可用模型的函數 ===
+        // 🟢 新增：動態向 Google 獲取可用模型的函數
         async function getBestGeminiModel(apiKey) {
             try {
-                // 拿著金鑰去向 Google 查詢你有權限使用的模型清單
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
-                if (!res.ok) return geminiModelName; // 查詢失敗就用預設的
+                if (!res.ok) return geminiModelName; 
                 
                 const data = await res.json();
                 
-                // 過濾出支援「生成文字(generateContent)」且名字包含「gemini」的模型
                 const validModels = data.models
                     .filter(m => m.supportedGenerationMethods.includes("generateContent") && m.name.includes("gemini"))
-                    .map(m => m.name.replace('models/', '')); // 拔掉前面的 'models/' 字串
+                    .map(m => m.name.replace('models/', '')); 
 
-                // 優先順序挑選：1.5-flash -> 1.5-pro -> 舊版 pro -> 隨便抓一個可用的
                 if (validModels.includes("gemini-1.5-flash")) return "gemini-1.5-flash";
                 if (validModels.includes("gemini-1.5-pro")) return "gemini-1.5-pro";
                 if (validModels.includes("gemini-pro")) return "gemini-pro";
@@ -1363,26 +1386,87 @@
             }
         }
 
-        // === 替換原有的 API 呼叫函數 ===
-        async function callGeminiAPI(sys, user) {
-            if(!appSettings.apiKeys.gemini) throw new Error("尚未在「設定」中綁定 API 金鑰");
+        // 🟢 修復：呼叫 Gemini API (包含 重試機制 + Google Search)
+        async function callGeminiAPI(sys, user, useSearch = true) {
+            const apiKey = appSettings.apiKeys.gemini;
+            if(!apiKey) throw new Error("尚未在「設定」中綁定 API 金鑰");
             
-            // 真正執行「自動偵測」
-            const actualModel = await getBestGeminiModel(appSettings.apiKeys.gemini);
+            const actualModel = await getBestGeminiModel(apiKey);
             
-            // 更新 UI 讓你知道它到底抓到了哪個模型
             const modelDisplay = document.getElementById('settings-current-model');
             if(modelDisplay) modelDisplay.textContent = actualModel + " (自動偵測)";
 
-            // 使用確認可用的模型發送 SOAP 請求
-            const res = await fetch(`${geminiApiUrlBase}${actualModel}:generateContent?key=${appSettings.apiKeys.gemini}`, {
-                method:'POST', headers:{'Content-Type':'application/json'},
-                body: JSON.stringify({ contents: [{parts:[{text:user}]}], systemInstruction: {parts:[{text:sys}]} })
-            });
+            const payload = {
+                contents: [{parts:[{text:user}]}], 
+                systemInstruction: {parts:[{text:sys}]},
+                tools: useSearch ? [{ "googleSearch": {} }] : []
+            };
+
+            let retries = 3;
+            let delay = 1000;
+
+            while (retries > 0) {
+                try {
+                    const res = await fetch(`${geminiApiUrlBase}${actualModel}:generateContent?key=${apiKey}`, {
+                        method:'POST', headers:{'Content-Type':'application/json'},
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if(!res.ok) throw new Error(`API 連線錯誤，狀態碼: ${res.status}`);
+                    const data = await res.json();
+                    const candidate = data.candidates[0];
+                    const text = candidate.content.parts[0].text;
+                    
+                    let sources = [];
+                    // 擷取 Google 搜尋引用來源
+                    if (useSearch && candidate.groundingMetadata?.groundingAttributions) {
+                        sources = candidate.groundingMetadata.groundingAttributions
+                            .map(attr => ({ uri: attr.web?.uri, title: attr.web?.title }))
+                            .filter(s => s.uri && s.title);
+                    }
+                    return { text, sources };
+                } catch (e) {
+                    retries--;
+                    if (retries === 0) throw e;
+                    await new Promise(r => setTimeout(r, delay));
+                    delay *= 2;
+                }
+            }
+        }
+
+        // 🟢 修復：補回呼叫 Grok API 函數 (含重試機制)
+        async function callGrokAPI(sys, user) {
+            const apiKey = appSettings.apiKeys.grok;
+            if (!apiKey) throw new Error("尚未在「設定」中綁定 Grok API 金鑰");
             
-            if(!res.ok) throw new Error(`API 連線錯誤，狀態碼: ${res.status}。請確認金鑰是否正確。`);
-            const data = await res.json();
-            return { text: data.candidates[0].content.parts[0].text, sources: [] };
+            const payload = {
+                model: grokModelName,
+                messages: [
+                    { "role": "system", "content": sys },
+                    { "role": "user", "content": user }
+                ]
+            };
+            
+            let retries = 3; 
+            let delay = 1000;
+            
+            while (retries > 0) {
+                try {
+                    const res = await fetch(grokApiUrlBase, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!res.ok) throw new Error(`Grok API 錯誤，狀態碼: ${res.status}`);
+                    const data = await res.json();
+                    return { text: data.choices[0].message.content, sources: [] };
+                } catch (e) {
+                    retries--;
+                    if (retries === 0) throw e;
+                    await new Promise(r => setTimeout(r, delay));
+                    delay *= 2;
+                }
+            }
         }
 
         function clearSoapInputs() {
@@ -1396,6 +1480,7 @@
             sourcesContainer.classList.add('hidden'); copyButton.disabled=true;
             autoCalcDisplay.classList.add('hidden'); autoCalcPlaceholder.classList.remove('hidden');
             destroyActiveCharts(); chartsContainer.classList.add('hidden');
+            guidelineListContainer.classList.add('hidden');
         }
         clearInputsButton.addEventListener('click', clearSoapInputs);
 
@@ -1405,10 +1490,41 @@
             else generateButton.classList.add('opacity-50', 'cursor-not-allowed');
         });
 
+        // 🟢 修復：AI 指引即時查詢按鈕邏輯
+        queryGuidelinesButton.addEventListener('click', async () => {
+            if (!appSettings.apiKeys.gemini) { showError("此功能需設定 Google Gemini API 金鑰。"); return; }
+            
+            queryGuidelinesButton.disabled = true;
+            queryGuidelinesButton.textContent = "查詢中...";
+            guidelineList.innerHTML = '';
+            guidelineListContainer.classList.add('hidden');
+            
+            const sys = `您是一位 AI 助手，任務是使用 Google 搜尋來**即時查核**以下常見臨床指引的「最新發布年份」。\n您的回覆必須嚴格遵守以下格式，僅回傳列表，不要有任何前言或結語：\n* [指引名稱] (例如：GINA - Asthma) - [最新年份]\n* [指引名稱] (例如：GOLD - COPD) - [最新年份]\n* [指引名稱] (例如：AHA/ACC - Hypertension) - [最新年份]\n* [指引名稱] (例如：Surviving Sepsis Campaign) - [最新年份]\n* [指引名稱] (例如：IDSA - Skin and Soft Tissue Infections) - [最新年份]\n* [指引名稱] (例如：KDIGO - CKD) - [最新年份]`;
+            const usr = "請立即使用 Google 搜尋，幫我查詢 GINA (Asthma), GOLD (COPD), AHA/ACC (Hypertension), Surviving Sepsis Campaign, IDSA (Skin and Soft Tissue Infections), 以及 KDIGO (CKD) 的最新指引發布年份。";
+            
+            try {
+                const { text } = await callGeminiAPI(sys, usr, true);
+                const lines = text.split('\n').filter(l => l.trim().length > 0);
+                lines.forEach(l => {
+                    const li = document.createElement('li');
+                    li.textContent = l.replace(/^\s*\*\s*/, '');
+                    guidelineList.appendChild(li);
+                });
+                guidelineListContainer.classList.remove('hidden');
+            } catch (e) {
+                showError("查詢指引失敗: " + e.message);
+            } finally {
+                queryGuidelinesButton.disabled = false;
+                queryGuidelinesButton.textContent = "立即查詢";
+            }
+        });
+
         generateButton.addEventListener('click', async () => {
             if(!termsCheckbox.checked) return;
             const pInfo = patientInfoInput.value; if(!pInfo.trim()) return showError("請輸入病患資料");
             
+            const provider = apiProviderSelect.value; // 獲取選擇的模型
+
             progressBarContainer.style.display='block'; placeholderDiv.classList.add('animate-pulse');
             generateButton.disabled=true; generateButton.classList.add('opacity-50');
             clearSoapOutputs(); parseAndRenderCharts(labDataInput.value, medDataInput.value);
@@ -1418,7 +1534,7 @@
             autoCalcList.innerHTML = acRes.map(r => `<li class="bg-white border border-slate-100 p-2.5 rounded-lg shadow-sm">${r.includes("待輸入") ? `<span class="text-slate-400 font-medium">${r}</span>` : `<span class="font-bold text-emerald-700">${r}</span>`}</li>`).join('');
             autoCalcDisplay.classList.remove('hidden'); autoCalcPlaceholder.classList.add('hidden');
 
-           // === 完整還原：v20.1 建立 Prompt (強化時序分析 + 嚴格輸出格式) ===
+            // 🟢 修復：完整還原 v20.1 核心 Prompt
             const sys = `您是一位頂尖的臨床藥師，擁有豐富的經驗，並且隨時掌握最新的國際醫療指引。
 
 您的任務是 (v21.3)：
@@ -1503,7 +1619,7 @@
     * **案例校正**：例如遇到 "BUROTAM"，您必須識別其為抗生素 **Cefoperazone 1g / Sulbactam 1g**，嚴禁誤判為 Piracetam。
     * **輸出格式**：在筆記中提到該藥品時，請統一標註為「商品名 (學名)」，例如：BUROTAM (Cefoperazone/Sulbactam)。`;
 
-            // === 組合 User Prompt (將所有選填欄位塞入) ===
+            // 組合 User Prompt
             const specialtyFocus = specialtyFocusSelect.value;
             const uptodateInfo = uptodateInfoInput.value.trim();
             const micromedexInfo = micromedexInfoInput.value.trim();
@@ -1517,18 +1633,93 @@
             if (openevidenceInfo) { usr += `\n--- OpenEvidence 資料 (選填) START ---\n${openevidenceInfo}\n--- OpenEvidence 資料 END ---\n`; }
             if (nhiGuidelinesInfo) { usr += `\n--- 健保給付規範 (選填) START ---\n${nhiGuidelinesInfo}\n--- 健保給付規範 END ---\n`; }
             usr += `\n請根據上述所有資訊，使用最新的國際指引產生一份藥師 SOAP 筆記。`;
+
             try {
-                const res = await callGeminiAPI(sys, usr);
-                const parts = res.text.split('---GUIDELINES_USED---');
-                outputDiv.innerHTML = marked.parse(parts[0].trim());
-                outputDiv.classList.remove('hidden'); placeholderDiv.classList.add('hidden'); copyButton.disabled=false;
+                let resultText = "";
+                let resultSources = [];
+
+                // 🟢 修復：根據選擇的模型進行呼叫
+                if (provider === 'gemini') {
+                    const res = await callGeminiAPI(sys, usr, true);
+                    resultText = res.text;
+                    resultSources = res.sources;
+                } else if (provider === 'grok') {
+                    const res = await callGrokAPI(sys, usr);
+                    resultText = res.text;
+                    resultSources = res.sources;
+                }
+
+                // 切割指引與筆記
+                let soapNote = resultText;
+                let guidelinesText = '';
+                if (resultText.includes('---GUIDELINES_USED---')) {
+                    const parts = resultText.split('---GUIDELINES_USED---');
+                    soapNote = parts[0].trim();
+                    guidelinesText = parts[1].trim();
+                }
+
+                // 🟢 修復：還原 LaTeX 數學符號清理過濾器
+                soapNote = soapNote.replace(/\$\$(.*?)\$\$/g, '$1').replace(/\$(.*?)\$/g, '$1')
+                    .replace(/\\text\{(.*?)\}/g, '$1').replace(/\\beta/g, 'β')
+                    .replace(/\\alpha/g, 'α').replace(/\\gamma/g, 'γ')
+                    .replace(/\\delta/g, 'δ').replace(/\\approx/g, '≈')
+                    .replace(/\\circ/g, '°').replace(/\\textdegree/g, '°')
+                    .replace(/\\mmHg/g, 'mmHg').replace(/\\/g, '')
+                    .replace(/\{/g, '').replace(/\}/g, '');
+
+                outputDiv.innerHTML = marked.parse(soapNote);
+                outputDiv.classList.remove('hidden'); 
+                placeholderDiv.classList.add('hidden'); 
+                copyButton.disabled = false;
                 
-                if(parts[1]) {
-                    sourcesList.innerHTML = parts[1].trim().split('\n').map(l=>`<li class="flex gap-2"><span class="text-blue-500 mt-0.5">•</span> <span>${l.replace(/^\*/,'').trim()}</span></li>`).join('');
+                // 渲染指引列表
+                let hasSources = false;
+                sourcesList.innerHTML = '';
+
+                if (guidelinesText) {
+                    const lines = guidelinesText.split('\n').filter(l => l.trim().length > 0);
+                    lines.forEach(l => {
+                        const li = document.createElement('li');
+                        li.className = 'flex gap-2 text-slate-700';
+                        li.innerHTML = `<span class="text-blue-500 mt-0.5">•</span> <span>${l.replace(/^\*/,'').trim()}</span>`;
+                        sourcesList.appendChild(li);
+                    });
+                    hasSources = true;
+                }
+
+                // 🟢 修復：還原 Google Search 來源渲染 (超連結)
+                if (resultSources && resultSources.length > 0) {
+                    if (hasSources) {
+                        const hr = document.createElement('li');
+                        hr.innerHTML = '<hr class="my-3 border-slate-200">';
+                        sourcesList.appendChild(hr);
+                    }
+                    const st = document.createElement('li');
+                    st.className = 'text-xs font-bold text-slate-400 uppercase tracking-widest mt-2 mb-1';
+                    st.textContent = 'Google 搜尋來源:';
+                    sourcesList.appendChild(st);
+
+                    resultSources.forEach(src => {
+                        const li = document.createElement('li');
+                        li.className = 'flex gap-2';
+                        li.innerHTML = `<span class="text-blue-500 mt-0.5">🔗</span> <a href="${src.uri}" target="_blank" class="text-blue-600 hover:underline break-all">${src.title || src.uri}</a>`;
+                        sourcesList.appendChild(li);
+                    });
+                    hasSources = true;
+                }
+
+                if (hasSources) {
                     sourcesContainer.classList.remove('hidden');
                 }
-            } catch(e) { showError(e.message); }
-            finally { progressBarContainer.style.display='none'; placeholderDiv.classList.remove('animate-pulse'); generateButton.disabled=false; generateButton.classList.remove('opacity-50'); }
+
+            } catch(e) { 
+                showError(e.message); 
+            } finally { 
+                progressBarContainer.style.display='none'; 
+                placeholderDiv.classList.remove('animate-pulse'); 
+                generateButton.disabled=false; 
+                generateButton.classList.remove('opacity-50'); 
+            }
         });
 
         // 取代原本的複製寫法，使用純原生 Clipboard API 提升手機相容性
